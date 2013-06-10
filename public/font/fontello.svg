@@ -1,0 +1,13 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg">
+<metadata>Copyright (C) 2012 by original authors @ fontello.com</metadata>
+<defs>
+<font id="fontello" horiz-adv-x="1000" >
+<font-face font-family="fontello" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
+<missing-glyph horiz-adv-x="1000" />
+<glyph glyph-name="basket-1" unicode="&#xe801;" d="M950 715q23 0 39-19t13-41l-53-365q-3-19-17-31t-34-13l-590 0 9-53 529 0q21 0 37-16t16-37-16-36-37-15l-573 0q-20 0-34 13t-17 30l-98 583-73 0q-21 0-37 15t-16 36 16 37 37 16l116 0q19 0 34-13t18-31l11-60 719 0z m-60-105l-200 0 0-104 185 0z m-253 0l-156 0 0-104 156 0 0 104z m0-156l-156 0 0-104 156 0 0 104z m-208 156l-183 0 19-105q3 1 8 1l156 0 0 104z m-156-156l18-104 139 0 0 104-156 0z m416-104l164 0 14 104-178 0 0-104z m-416-390q0 78 78 78 79 0 79-78 0-79-79-79-78 0-78 79z m469 0q0 78 78 78 79 0 79-78 0-79-79-79-78 0-78 79z" horiz-adv-x="1003" />
+<glyph glyph-name="basket" unicode="&#xe800;" d="M150 0q0 40 30 70t70 30q42 0 71-30t29-70q0-42-29-71t-71-29q-40 0-70 29t-30 71z m500 0q0 40 30 70t70 30q42 0 71-30t29-70q0-42-29-71t-71-29q-40 0-70 29t-30 71z m-322 236q-36-10-34-23t44-13l562 0 0-76q0-20-20-20l-654 0q-20 0-20 20l0 76-10 46-98 454-98 0 0 80q0 20 20 20l156 0q20 0 20-20l0-86 704 0 0-274q0-22-18-26z" horiz-adv-x="900" />
+</font>
+</defs>
+</svg>
