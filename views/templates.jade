@@ -1,16 +1,14 @@
-script(type='text/ng-template', id='yo-product')
-    div.thumbnail
-      img(data-src='holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;', src='')
-      div.caption
-        h3 {{item.title}}
-        p {{item.desc}}
-        p Price: {{item.price}}
-        p Quantity:
-          input#q_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_quantity}}', maxlength='5', min='0')
-        p Size:
-          input#w_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_width}}', maxlength='5', min='0')
-          span X
-          input#h_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_height}}', maxlength='5', min='0')
-        p: a.btn.btn-primary(href='#') Add
-
-script(type='text/ng-template', id='yo-product-detail')
+script(type='text/ng-template', id='yo-product-detail-tpl')
+  div.thumbnail(data-yo-product-detail)
+    img(data-src='holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;', src='')
+    div.caption
+      h3 {{item.title}}
+      p {{item.desc}}
+      p Price: {{item.price}}
+      p Quantity:
+        input#q_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_quantity}}', maxlength='5', min='0')
+      p Size:
+        input#w_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_width}}', maxlength='5', min='0')
+        span X
+        input#h_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_height}}', maxlength='5', min='0')
+      p: a.btn.btn-primary(href='#') Add

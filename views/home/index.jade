@@ -2,6 +2,7 @@ extends ../layout
 
 block content
   div.row-fluid.main
-    div.span8
-      ul.thumbnails(ng-controller='yoProduct')
-        li.span4(ng-repeat='item in products', data-yo-product)
+    div.span8(ng-controller='yoProductCtrl')
+      div.loading Loading...
+      ul.thumbnails(ng-controller='yoProductDetailCtrl')
+        li.span4(ng-repeat='item in products', data-yo-product-detail)
