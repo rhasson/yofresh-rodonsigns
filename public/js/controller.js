@@ -40,3 +40,6 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders) {
 //YoApp.directive('yoBasketDropdown')
 
 //YoApp.directive('yoCheckout')
+
+
+//CryptoJS.MD5('this is a test').toString()

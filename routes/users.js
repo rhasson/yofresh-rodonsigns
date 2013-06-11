@@ -2,8 +2,8 @@ var db = require('../lib/db');
 
 module.exports = exports = {
 	list: function(req, resp, next) {
-		if (req.session && req.session.id) {
-			db.get('users', req.session.id)
+		if (req.session && 'name' in req.session) {
+			db.get('users', req.session.user_id)
 			.then(function(user) {
 				if (!(_id in user)) resp.json({error: { code: 0, message: 'user not found'}});
 				else {
@@ -22,7 +22,7 @@ module.exports = exports = {
 		next();
 	},
 	update: function(req, resp, next) {
-		if (req.session && req.session.id && req.params.id === req.session.id) {			
+		if (req.session && 'name' in req.session && req.params.id === req.session.user_id) {			
 			db.update('users', req.params.id, req.body)
 			.then(function(doc) {
 				resp.json(doc);	
@@ -35,7 +35,7 @@ module.exports = exports = {
 		}
 	},
 	remove: function(req, resp, next) {
-		if (req.session && req.session.id) {
+		if (req.session && 'name' in req.session) {
 			db.del(req.params.id)
 			.then(function(doc) {
 				resp.json(doc);

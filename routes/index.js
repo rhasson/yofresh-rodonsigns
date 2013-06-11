@@ -1,7 +1,7 @@
 var Users = require('./users')
  	, Products = require('./products')
  	, Orders = require('./orders')
- 	, db = require('db')
+ 	, db = require('../lib/db')
  	, crypto = require('crypto')
  	, kue = require('kue')
  	, jobs = kue.createQueue();
@@ -12,7 +12,7 @@ module.exports = exports = {
 		login: function(req, resp, next) {
 			db.auth(req.params.email, req.body.password)
 			.then(function(auth) {
-				req.session.id = auth.id;
+				req.session.user_id = auth.id;
 				req.session.name = {first: auth.firstname, last: auth.lastname};
 				req.session.email = auth.email;
 				resp.render('home', {name: req.session.name, email: req.session.email});
@@ -31,14 +31,14 @@ module.exports = exports = {
 					firstname: req.body.firstname,
 					lastname: req.body.lastname,
 					email: req.body.email,
-					password: req.body.password  //b64 decode then hash before saving
+					password: req.body.password
 				})
 				.then(function(doc) {
-					jobs.add('new user', {id: doc._id}).priority('high').save();
+					//jobs.add('new user', {id: doc._id}).priority('high').save();
 					
 					db.auth(req.params.email, req.body.password)
 					.then(function(auth) {
-						req.session.id = auth.id;
+						req.session.user_id = auth.id;
 						req.session.name = {first: auth.firstname, last: auth.lastname};
 						req.session.email = auth.email;
 						resp.render('home', {name: req.session.name, email: req.session.email});
@@ -54,10 +54,10 @@ module.exports = exports = {
 			}
 		},
 		index: function(req, resp, next) {
-			if (req.session && req.session.user_id) {
-				resp.render('home', {user: req.session.username});
+			if (req.session && 'name' in req.session) {
+				resp.render('home', {user: req.session.name});
 			} else {
-				resp.render('register', {layout: false});
+				resp.render('register', {laytou:false});
 			}
 		}
 	},

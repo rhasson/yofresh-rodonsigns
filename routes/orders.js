@@ -2,7 +2,7 @@ var db = require('../lib/db');
 
 module.exports = exports = {
 	list: function(req, resp, next) {
-		if (req.session && req.session.id) {
+		if (req.session && 'name' in req.session) {
 			db.get('orders', req.params.id || null)
 			.then(function(doc) {
 				resp.json(doc);
@@ -15,8 +15,8 @@ module.exports = exports = {
 		}
 	},
 	save: function(req, resp, next) {
-		if (req.session && req.session.id) {
-			db.save('orders', req.session.id, req.body)
+		if (req.session && 'name' in req.session) {
+			db.save('orders', req.session.user_id, req.body)
 			.then(function(doc) {
 				resp.json(doc);
 			})
@@ -28,7 +28,7 @@ module.exports = exports = {
 		}
 	},
 	update: function(req, resp, next) {
-		if (req.session && req.session.id) {
+		if (req.session && 'name' in req.session) {
 			db.update('orders', req.params.id, req.body)
 			.then(function(doc) {
 				resp.json(doc);
@@ -41,7 +41,7 @@ module.exports = exports = {
 		}
 	},
 	remove: function(req, resp, next) {
-		if (req.session && req.session.id) {
+		if (req.session && 'name' in req.session) {
 			db.del(req.params.id)
 			.then(function(doc) {
 				resp.json(doc);
