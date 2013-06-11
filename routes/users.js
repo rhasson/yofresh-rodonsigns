@@ -3,9 +3,11 @@ var db = require('../lib/db');
 module.exports = exports = {
 	list: function(req, resp, next) {
 		if (req.session && 'name' in req.session) {
-			db.get('users', req.session.user_id)
+			db.get('users', req.params.id || null)
 			.then(function(user) {
-				if (!(_id in user)) resp.json({error: { code: 0, message: 'user not found'}});
+				var u;
+				if (user instanceof Array) u = user.length ? user[0] : {};
+				if (!(_id in u)) resp.json({error: { code: 0, message: 'user not found'}});
 				else {
 					delete user.password;
 					resp.json(user);
