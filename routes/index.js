@@ -10,24 +10,27 @@ var Users = require('./users')
 module.exports = exports = {
 	base: {
 		login: function(req, resp, next) {
-			db.auth(req.params.email, req.body.password)
+			console.log(req.body)
+			db.auth(req.body.email, req.body.password)
 			.then(function(auth) {
 				req.session.user_id = auth.id;
 				req.session.name = {first: auth.firstname, last: auth.lastname};
 				req.session.email = auth.email;
-				resp.render('home', {name: req.session.name, email: req.session.email});
+				//resp.render('home', {name: req.session.name, email: req.session.email});
+				resp.json(auth);
 			})
 			.fail(function(err) {
-				resp.json({error: {code: 0, message: 'login failed'}});
+				resp.json({error: {code: 2, message: err.message || 'login failed'}});
 			});
 		},
 		logout: function(req, resp, next) {
 			req.session = null;
-			resp.redirect('/');
+			resp.json({status: 'ok'});
 		},
 		register: function(req, resp, next) {
 			if (req.session) {
-				db.save('user', '', {
+				console.log('BODY: ', req.body);
+				db.save('users', '', {
 					firstname: req.body.firstname,
 					lastname: req.body.lastname,
 					email: req.body.email,
@@ -36,28 +39,30 @@ module.exports = exports = {
 				.then(function(doc) {
 					//jobs.add('new user', {id: doc._id}).priority('high').save();
 					
-					db.auth(req.params.email, req.body.password)
+					db.auth(req.body.email, req.body.password)
 					.then(function(auth) {
 						req.session.user_id = auth.id;
 						req.session.name = {first: auth.firstname, last: auth.lastname};
 						req.session.email = auth.email;
-						resp.render('home', {name: req.session.name, email: req.session.email});
+						//resp.render('home', {name: req.session.name, email: req.session.email});
+						resp.json({status: 'ok'});
 					})
 					.fail(function(err) {
-						resp.json({error: {code: 0, message: 'login failed'}});
+						console.log(err)
+						resp.json({error: {code: 2, message: err.message || 'login failed'}});
 					});
 				})
 				.fail(function(err) {
-					resp.render('error', {message: 'registration failed'});
+					resp.json({error: {code: 1, message: err.message || 'registration failed'}});
 				});
-
 			}
 		},
 		index: function(req, resp, next) {
 			if (req.session && 'name' in req.session) {
-				resp.render('home', {user: req.session.name});
+				//resp.render('home', {user: req.session.name});
+				resp.render('home');
 			} else {
-				resp.render('register', {laytou:false});
+				resp.render('home'); //, {laytou:false});
 			}
 		}
 	},

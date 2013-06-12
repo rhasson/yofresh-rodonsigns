@@ -1,8 +1,68 @@
+script(type='text/ng-template', id='yo-login-form-tpl')
+  div.span3
+  div.span6(ng-controller='yoLoginCtrl')
+    div.well
+      div.message.alert.alert-error.hide
+      form.form-horizontal
+        div.control-group
+          label.control-label(for='iEmail') E-mail:
+          div.controls
+            input(type='text', id='iEmail', placeholder='email address', ng-model='email', required)
+        div.control-group
+          label.control-label(for='iPassword') Password:
+          div.controls
+            input(type='password', id='iPassword', ng-model='password', required)
+        div.control-group
+          div.controls
+            button.btn(type='submit', id='login_button', ng-click='login()') Login
+        div.control-group
+          div.controls
+            p Need to register? 
+              a(href='#/register') Register here
+  div.span3
+
+script(type='text/ng-template', id='yo-register-form-tpl')
+  div.span3
+  div.span6(ng-controller='yoLoginCtrl')
+    div.well
+      div.message.alert.alert-error.hide
+      form.form-horizontal
+        div.control-group
+          label.control-label(for='iFirstname') First name:
+          div.controls
+            input(type='text', id='iFirstname', placeholder='first name', ng-model='firstname', required)
+        div.control-group
+          label.control-label(for='iLastname') Last name:
+          div.controls
+            input(type='text', id='iLastname', placeholder='last name', ng-model='lastname', required)
+        div.control-group
+          label.control-label(for='iEmail') E-mail:
+          div.controls
+            input(type='text', id='iEmail', placeholder='email address', ng-model='email', required)
+        div.control-group
+          label.control-label(for='iPassword') Password:
+          div.controls
+            input(type='password', id='iPassword', ng-model='password', required)
+        div.control-group
+          div.controls
+            button.btn(type='submit', id='reg_button', ng-click='register()') Register
+        div.control-group
+          div.controls
+            p Back to 
+              a(href='#/login') login
+  div.span3
+
+script(type='text/ng-template', id='yo-home-tpl')
+  div.span8(ng-controller='yoProductCtrl')
+    div.loading Loading...
+    ul.thumbnails(ng-controller='yoProductDetailCtrl')
+      li.span4(ng-repeat='item in products', data-yo-product-detail)
+
 script(type='text/ng-template', id='yo-product-detail-tpl')
-  div.thumbnail(data-yo-product-detail)
+  div.thumbnail
     img(data-src='holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;', src='')
     div.caption
-      h3 {{item.title}}
+      h3 {{item.name}}
       p {{item.desc}}
       p Price: {{item.price}}
       p Quantity:

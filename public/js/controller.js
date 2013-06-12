@@ -4,59 +4,136 @@ var YoApp = angular.module('YoApp',
 	 , 'ngSanitize'
 	]);
 
+YoApp.config(function($routeProvider) {
+	$routeProvider
+		.when('/', {
+				templateUrl: 'yo-login-form-tpl',
+				controller: 'yoLoginCtrl'
+			})
+		.when('/login', {
+				templateUrl: 'yo-login-form-tpl',
+				controller: 'yoLoginCtrl'
+			})
+		.when('/register', {
+				templateUrl: 'yo-register-form-tpl',
+				controller: 'yoRegisterCtrl'
+			})
+		.when('/home', {
+				templateUrl: 'yo-home-tpl',
+				controller: 'yoMainCtrl'
+			})
+		.when('/logout', {
+				templateUrl: 'yo-logout-tpl',
+				controller: 'yoLogoutCtrl'
+			});
+});
+
 /* main product list controller */
 YoApp.controller('yoProductCtrl', function($scope, service_products) {
 	var ps = service_products.query({
 		} ,function() {
 			$('div.loading').remove();
 			$scope.products = ps;
+			console.log($scope)
 		} ,function() {
 			$('div.loading').html('Failed to retrieve product');
 		});
 });
 
-/* attach a data-yo-product-detail to each product to include its details */
-YoApp.directive('yoProductDetail', function() {
-	var linkFn = function(scope, element, attr) {
+/* product detail controller */
+YoApp.controller('yoProductDetailCtrl', function($scope) {
 
+});
+
+/* controller for main application handling */
+YoApp.controller('yoMainCtrl', function($scope, $rootScope) {
+	//if ($rootScope.isLoggedin !== true) window.location.href = '#/login';
+});
+
+/* controller for handling logout */
+YoApp.controller('yoLogoutCtrl', function($scope, $rootScope) {
+	$.get('/logout')
+		.done(function(data) {
+			if (data.status === 'ok'){
+				$rootScope.isLoggedin = false;
+				window.location.href = '#/';
+			}
+		})
+});
+
+/* controller for handling user logins */
+YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
+	if ($rootScope.isLoggedin) window.location.href = '#/home';
+	$scope.login = function() {
+		if ($scope.email && $scope.email !== '' && $scope.password && $scope.password !== '') {
+			$('.message')
+			  .fadeOut();
+			$.post('/login', {
+					email: $('#iEmail').val(),
+					password: CryptoJS.MD5($('#iPassword').val()).toString()
+				}
+			)
+			.done(function(user) {
+				if (user && !('error' in user)) {
+					$scope.user = user;
+					$rootScope.isLoggedin = true;
+					window.location.href = '#/home';
+				} else {
+					$rootScope.isLoggedin = false;
+					$('.message')
+					  .html(user.error.message)
+					  .fadeIn();
+				}
+			})
+			.fail(function(err) {
+				console.log('login attempt failed')
+			});
+		} else {
+			$('.message')
+			  .html('Please fill in the missing information!')
+			  .fadeIn();
+		}
 	}
+});
 
+/* controller for handling user registration */
+YoApp.controller('yoRegisterCtrl', function($scope, $rootScope) {
+	$scope.register = function() {
+		if ($scope.email && $scope.email !== '' && $scope.password && $scope.password !== '') {
+			$('.message')
+			  .fadeOut();
+			$.post('/register', {
+					email: $('#iEmail').val(),
+					firstname: $('#iFirstname').val(),
+					lastname: $('#iLastname').val(),
+					password: CryptoJS.MD5($('#iPassword').val()).toString()
+				}
+			)
+			.done(function(body) {
+				console.log(body)
+				if ('error' in body) {
+					if (body.error.code === 1) {
+						$('.message')
+						  .html('Email is already in use!')
+						  .fadeIn();
+					} else {
+						$scope.user = body;
+						$rootScope.isLoggedin = true;
+						window.location.href = '#/home';
+					}
+				}
+			})
+			.fail(function(err) {
+				console.log('err: ', err);
+			});
+		} else { console.log('not registering') }
+	}
+});
+
+YoApp.directive('yoProductDetail', function() {
 	return {
 		restrict: 'A',
 		templateUrl: 'yo-product-detail-tpl',
-		link: linkFn
-	};
+		controller: 'yoProductDetailCtrl'
+	}
 });
-
-/* controller for each product item */
-YoApp.controller('yoProductDetailCtrl', function($scope, service_products) {
-
-});
-
-YoApp.controller('yoOrdersCtrl', function($scope, service_orders) {
-
-});
-
-YoApp.controller('yoRegister', function($scope) {
-	$.post('/register/'+$('#iEmail').value(), {
-			email: $('#iEmail').value(),
-			firstname: $('#iFirstname').value(),
-			lastname: $('#iLastname').value(),
-			password: CryptoJS.MD5($('#iPassword').value()).toString()
-		})
-		.done(function(body, status, xhr) {
-			console.log(status, body);
-		}),
-		.fail(function(err) {
-			console.log(err);
-		});
-	});
-});
-
-
-//YoApp.directive('yoBasketDropdown')
-
-//YoApp.directive('yoCheckout')
-
-
-//CryptoJS.MD5('this is a test').toString()

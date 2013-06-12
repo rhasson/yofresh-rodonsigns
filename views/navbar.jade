@@ -2,7 +2,7 @@ div.navbar.navbar-fixed-top
   div.navbar-inner
     div.container
       a.brand(href="#") YoFresh
-      ul.nav.pull-right
+      ul.nav.pull-right(ng-show="isLoggedin")
         li.dropdown
           a.dropdown-toggle(href="#", data-toggle="dropdown")
             i.icon-basket-1 Basket

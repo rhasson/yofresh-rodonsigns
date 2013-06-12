@@ -35,9 +35,9 @@ server.configure('production', function(){
 });
 
 server.get('/', routes.base.index);
-server.get('/login/:email', routes.base.login);
+server.post('/login', routes.base.login);
 server.get('/logout', routes.base.logout);
-server.get('/register', routes.base.register);
+server.post('/register', routes.base.register);
 
 server.get('/api/v0/products', routes.api.v0.products.list);
 server.get('/api/v0/products/:id', routes.api.v0.products.list);
