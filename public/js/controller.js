@@ -1,6 +1,7 @@
 var YoApp = angular.module('YoApp', 
 	['YoApp.services.Products'
 	 , 'YoApp.services.Orders'
+	 , 'YoApp.services.Session'
 	 , 'ngSanitize'
 	]);
 
@@ -28,10 +29,15 @@ YoApp.config(function($routeProvider) {
 			});
 });
 
+/* controller for main application handling */
+YoApp.controller('yoMainCtrl', function($scope, service_session) {
+	if (!service_session.isLoggedin) window.location.href = '#/login';
+});
+
 /* main product list controller */
-YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_products) {
+YoApp.controller('yoProductCtrl', function($scope, service_session, service_products) {
 	var ps;
-	if ($rootScope.isLoggedin) {
+	if (service_session.isLoggedin) {
 		console.log('CALLING PRODUCT CTRL')
 		ps = service_products.query({
 			} ,function() {
@@ -48,17 +54,12 @@ YoApp.controller('yoProductDetailCtrl', function($scope) {
 
 });
 
-/* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, $rootScope) {
-	if (!$rootScope.isLoggedin) window.location.href = '#/login';
-});
-
 /* controller for handling logout */
-YoApp.controller('yoLogoutCtrl', function($scope, $rootScope) {
+YoApp.controller('yoLogoutCtrl', function($scope, service_session) {
 	$.get('/logout')
 		.done(function(data) {
 			if (data.status === 'ok'){
-				$scope.isLoggedin = false;
+				service_session.logout();
 				window.location.href = '#/';
 			}
 		})
