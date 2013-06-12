@@ -29,15 +29,18 @@ YoApp.config(function($routeProvider) {
 });
 
 /* main product list controller */
-YoApp.controller('yoProductCtrl', function($scope, service_products) {
-	var ps = service_products.query({
-		} ,function() {
-			$('div.loading').remove();
-			$scope.products = ps;
-			console.log($scope)
-		} ,function() {
-			$('div.loading').html('Failed to retrieve product');
+YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_products) {
+	var ps;
+	if ($rootScope.isLoggedin) {
+		console.log('CALLING PRODUCT CTRL')
+		ps = service_products.query({
+			} ,function() {
+				$('div.loading').remove();
+				$scope.products = ps;
+			} ,function() {
+				$('div.loading').html('Failed to retrieve product');
 		});
+	}
 });
 
 /* product detail controller */
@@ -47,7 +50,7 @@ YoApp.controller('yoProductDetailCtrl', function($scope) {
 
 /* controller for main application handling */
 YoApp.controller('yoMainCtrl', function($scope, $rootScope) {
-	//if ($rootScope.isLoggedin !== true) window.location.href = '#/login';
+	if (!$rootScope.isLoggedin) window.location.href = '#/login';
 });
 
 /* controller for handling logout */
@@ -55,7 +58,7 @@ YoApp.controller('yoLogoutCtrl', function($scope, $rootScope) {
 	$.get('/logout')
 		.done(function(data) {
 			if (data.status === 'ok'){
-				$rootScope.isLoggedin = false;
+				$scope.isLoggedin = false;
 				window.location.href = '#/';
 			}
 		})
@@ -86,7 +89,8 @@ YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
 				}
 			})
 			.fail(function(err) {
-				console.log('login attempt failed')
+				console.log('login attempt failed');
+				$rootScope.isLoggedin = false;
 			});
 		} else {
 			$('.message')
@@ -110,7 +114,6 @@ YoApp.controller('yoRegisterCtrl', function($scope, $rootScope) {
 				}
 			)
 			.done(function(body) {
-				console.log(body)
 				if ('error' in body) {
 					if (body.error.code === 1) {
 						$('.message')
@@ -124,7 +127,7 @@ YoApp.controller('yoRegisterCtrl', function($scope, $rootScope) {
 				}
 			})
 			.fail(function(err) {
-				console.log('err: ', err);
+				$rootScope.isLoggedin = false;
 			});
 		} else { console.log('not registering') }
 	}
