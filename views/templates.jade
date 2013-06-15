@@ -1,6 +1,6 @@
 script(type='text/ng-template', id='yo-login-form-tpl')
   div.span3
-  div.span6(ng-controller='yoLoginCtrl')
+  div.span6
     div.well
       div.message.alert.alert-error.hide
       form.form-horizontal
@@ -23,7 +23,7 @@ script(type='text/ng-template', id='yo-login-form-tpl')
 
 script(type='text/ng-template', id='yo-register-form-tpl')
   div.span3
-  div.span6(ng-controller='yoRegisterCtrl')
+  div.span6
     div.well
       div.message.alert.alert-error.hide
       form.form-horizontal
@@ -53,12 +53,13 @@ script(type='text/ng-template', id='yo-register-form-tpl')
   div.span3
 
 script(type='text/ng-template', id='yo-logout-tpl')
+  div Thank You!
 
 script(type='text/ng-template', id='yo-home-tpl')
   div.span8(ng-controller='yoProductCtrl')
     div.loading Loading...
-    ul.thumbnails(ng-controller='yoProductDetailCtrl')
-      li.span4(ng-repeat='item in products', data-yo-product-detail)
+    ul.thumbnails
+      li.span4(ng-repeat='item in model.products', data-yo-product-detail)
 
 script(type='text/ng-template', id='yo-product-detail-tpl')
   div.thumbnail
@@ -67,10 +68,28 @@ script(type='text/ng-template', id='yo-product-detail-tpl')
       h3 {{item.name}}
       p {{item.desc}}
       p Price: {{item.price}}
-      p Quantity:
-        input#q_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_quantity}}', maxlength='5', min='0')
-      p Size:
-        input#w_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_width}}', maxlength='5', min='0')
-        span X
-        input#h_{{item.id}}.input-mini(type='number', inputmode='numeric', value='{{item.default_height}}', maxlength='5', min='0')
-      p: a.btn.btn-primary(href='#') Add
+      p Quantity: {{item.default_quantity}}
+      p Size: {{item.default_width}}" X {{item.default_height}}"
+      p: a.btn.btn-primary(ng-click='add()') Add
+
+script(type='text/ng-template', id='yo-user-items-tpl')
+  li: a(href='#/account') Account
+  li: a(href='#/logout') Logout
+
+script(type='text/ng-template', id='yo-basket-items-tpl')
+  {{item.name}}
+
+script(type='text/ng-template', id='yo-checkout-tpl')
+  div.span8
+    div.media(ng-repeat='item in model.basket', data-yo-checkout-items)
+  p: a.btn.btn-primary(href='#', ng-click='checkout()') Checkout
+  p: a.btn(href='#', ng-click='cancel()') Cancel
+
+script(type='text/ng-template', id='yo-checkout-items-tpl')
+  a.pull-left(href='#')
+    img.media-object(data-src='holder.js/64x64', src='')
+  div.media-body
+    h4.media-heading {{item.name}}
+    p Size: {{item.default_width}}" X {{item.default_height}}"
+    p Quantity: {{item.default_quantity}}
+    p Price: ${{item.price}}

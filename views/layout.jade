@@ -3,8 +3,8 @@ html(ng-app='YoApp')
   include header
   body
     include templates
-    div.container-fluid(ng-controller="yoMainCtrl")
+    div.container-fluid
       include navbar
       block content
     block scripts
-      include scripts
+      include scripts_local

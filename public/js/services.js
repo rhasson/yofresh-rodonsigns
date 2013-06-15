@@ -1,15 +1,27 @@
+/*******************************************************************
+* Product service
+* Returns ngResource to interface with product API
+********************************************************************/
 angular.module('YoApp.services.Products', ['ngResource']).
 	factory('service_products', ['$rootScope', '$resource', function(root, $resource) {
 		return $resource('/api/v0/products/:id', {id: '@id'});
 	}]);
 
+/*******************************************************************
+* Orders service
+* Returns ngResource to interface with orders API
+********************************************************************/
 angular.module('YoApp.services.Orders', ['ngResource']).
 	factory('service_orders', ['$rootScope', '$resource', function(root, $resource) {
 		return $resource('/api/v0/orders/:id', {id: '@id'});
 	}]);
 
-angular.module('YoApp.services.Session', ['ngHttp']).
-	factory('service_session', ['$rootScope', '$http', function(root, $http) {
+/*******************************************************************
+* Application Configuration
+* Returns a session class that manages the logged in user
+********************************************************************/
+angular.module('YoApp.services.Session', []).
+	factory('service_session', ['$rootScope', function(root) {
 		function Session() {
 			this.user = {};
 			this.token = '';
@@ -27,8 +39,8 @@ angular.module('YoApp.services.Session', ['ngHttp']).
 		}
 
 		Session.prototype.set = function(user) {
-			if (user.token) {
-				this.token = user.token;
+			if (user._id) {
+				this.token = user._id;
 				this.user = user;
 				this.loggedIn = true;
 			}

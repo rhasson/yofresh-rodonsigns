@@ -1,3 +1,7 @@
+/*******************************************************************
+* YoFresh Application
+* v0.0.1
+********************************************************************/
 var YoApp = angular.module('YoApp', 
 	['YoApp.services.Products'
 	 , 'YoApp.services.Orders'
@@ -5,7 +9,12 @@ var YoApp = angular.module('YoApp',
 	 , 'ngSanitize'
 	]);
 
+/*******************************************************************
+* Application Configuration
+*
+********************************************************************/
 YoApp.config(function($routeProvider) {
+/* Page router configuration */
 	$routeProvider
 		.when('/', {
 				templateUrl: 'yo-login-form-tpl',
@@ -19,39 +28,38 @@ YoApp.config(function($routeProvider) {
 				templateUrl: 'yo-register-form-tpl',
 				controller: 'yoRegisterCtrl'
 			})
+		.when('/logout', {
+				templateUrl: 'yo-logout-tpl',
+				controller: 'yoLogoutCtrl'
+			})
 		.when('/home', {
 				templateUrl: 'yo-home-tpl',
 				controller: 'yoMainCtrl'
 			})
-		.when('/logout', {
-				templateUrl: 'yo-logout-tpl',
-				controller: 'yoLogoutCtrl'
+		.when('/checkout', {
+				templateUrl: 'yo-checkout-tpl',
+				controller: 'yoCheckoutCtrl'
 			});
 });
 
+/*******************************************************************
+* Controllers
+* All UI element controllers
+********************************************************************/
 /* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, service_session) {
-	if (!service_session.isLoggedin) window.location.href = '#/login';
-});
+YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session) {
+	if (!service_session.isLoggedin()) window.location.href = '#/login';
+	else {
+		$rootScope.model = {};
+		$rootScope.model.user = service_session.get();
+		$rootScope.model.basket = [];
+		$rootScope.model.products = [];
 
-/* main product list controller */
-YoApp.controller('yoProductCtrl', function($scope, service_session, service_products) {
-	var ps;
-	if (service_session.isLoggedin) {
-		console.log('CALLING PRODUCT CTRL')
-		ps = service_products.query({
-			} ,function() {
-				$('div.loading').remove();
-				$scope.products = ps;
-			} ,function() {
-				$('div.loading').html('Failed to retrieve product');
-		});
+		$('ul.nav').children().each(function(i,a){$(a).show()});
+		//$('i.icon-user').parent().append(' '+$scope.model.user.firstname);
+		//$('i.icon-basket-1').parent().append(' Basket');
+		console.log(service_session, $scope)
 	}
-});
-
-/* product detail controller */
-YoApp.controller('yoProductDetailCtrl', function($scope) {
-
 });
 
 /* controller for handling logout */
@@ -60,14 +68,15 @@ YoApp.controller('yoLogoutCtrl', function($scope, service_session) {
 		.done(function(data) {
 			if (data.status === 'ok'){
 				service_session.logout();
+				$('ul.nav').children().each(function(i,a){$(a).hide()})
 				window.location.href = '#/';
 			}
 		})
 });
 
 /* controller for handling user logins */
-YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
-	if ($rootScope.isLoggedin) window.location.href = '#/home';
+YoApp.controller('yoLoginCtrl', function($scope, service_session) {
+	if (service_session.isLoggedin()) window.location.href = '#/home';
 	$scope.login = function() {
 		if ($scope.email && $scope.email !== '' && $scope.password && $scope.password !== '') {
 			$('.message')
@@ -79,11 +88,10 @@ YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
 			)
 			.done(function(user) {
 				if (user && !('error' in user)) {
-					$scope.user = user;
-					$rootScope.isLoggedin = true;
+					service_session.set(user);
 					window.location.href = '#/home';
 				} else {
-					$rootScope.isLoggedin = false;
+					service_session.logout();
 					$('.message')
 					  .html(user.error.message)
 					  .fadeIn();
@@ -91,7 +99,7 @@ YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
 			})
 			.fail(function(err) {
 				console.log('login attempt failed');
-				$rootScope.isLoggedin = false;
+				service_session.logout();
 			});
 		} else {
 			$('.message')
@@ -102,7 +110,7 @@ YoApp.controller('yoLoginCtrl', function($scope, $rootScope) {
 });
 
 /* controller for handling user registration */
-YoApp.controller('yoRegisterCtrl', function($scope, $rootScope) {
+YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 	$scope.register = function() {
 		if ($scope.email && $scope.email !== '' && $scope.password && $scope.password !== '') {
 			$('.message')
@@ -121,23 +129,85 @@ YoApp.controller('yoRegisterCtrl', function($scope, $rootScope) {
 						  .html('Email is already in use!')
 						  .fadeIn();
 					} else {
-						$scope.user = body;
-						$rootScope.isLoggedin = true;
+						service_session.set(body);
 						window.location.href = '#/home';
 					}
 				}
 			})
 			.fail(function(err) {
-				$rootScope.isLoggedin = false;
+				service_session.logout();
 			});
 		} else { console.log('not registering') }
 	}
 });
 
+/* product list controller to retreive all products from db */
+YoApp.controller('yoProductCtrl', function($scope, service_session, service_products) {
+	var ps;
+	if (service_session.isLoggedin()) {
+		ps = service_products.query({
+			} ,function() {
+				$('div.loading').remove();
+				$scope.model.products = ps;
+			} ,function() {
+				$('div.loading').html('Failed to retrieve product');
+		});
+	}
+});
+
+/* contoller for handling interactions with product details */
+YoApp.controller('yoProductDetailCtrl', function($scope) {
+	$scope.add = function() {
+		console.log('details: ', $scope.model);
+		$scope.model.basket.push($scope.item);
+	}
+});
+
+/* contoller for handling interactions with product details */
+YoApp.controller('yoBasketMenuCtrl', function($scope) {
+	console.log('BASKET: ', $scope)
+});
+
+/* contoller for handling interactions with product details */
+YoApp.controller('yoCheckoutCtrl', function($scope) {
+
+});
+
+/*******************************************************************
+* Directives
+* All UI element directives
+********************************************************************/
+/* create product detail ui elements */
 YoApp.directive('yoProductDetail', function() {
 	return {
 		restrict: 'A',
 		templateUrl: 'yo-product-detail-tpl',
 		controller: 'yoProductDetailCtrl'
+	}
+});
+
+/* create user top level menu items */
+YoApp.directive('yoUserItems', function() {
+	return {
+		restrict: 'A',
+		templateUrl: 'yo-user-items-tpl'
+	}
+});
+
+/* list products as they are added to the shipping basket */
+YoApp.directive('yoBasketItems', function() {
+	return {
+		restrict: 'A',
+		transclude: true,
+		controller: 'yoBasketMenuCtrl',
+		templateUrl: 'yo-basket-items-tpl'
+	}
+});
+
+/* list products which are being checked out */
+YoApp.directive('yoCheckoutItems', function() {
+	return {
+		restrict: 'A',
+		templateUrl: 'yo-checkout-items-tpl'
 	}
 });

@@ -2,10 +2,16 @@ div.navbar.navbar-fixed-top
   div.navbar-inner
     div.container
       a.brand(href="#") YoFresh
-      ul.nav.pull-right(ng-show="isLoggedin")
-        li.dropdown
-          a.dropdown-toggle(href="#", data-toggle="dropdown")
-            i.icon-basket-1 Basket
+      ul.nav.pull-right
+        li.hide.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown") {{model.user.firstname}}
+            i.icon-user
+          ul.dropdown-menu(data-yo-user-items)
+
+        li.hide.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown") Basket
+            i.icon-basket-1
           ul.dropdown-menu
-            li Item 1
-            li Item 2
+            li(ng-repeat='item in model.basket', data-yo-basket-items)
+            li.divider
+            li: a(href='#/checkout') Checkout

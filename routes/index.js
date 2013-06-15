@@ -13,7 +13,7 @@ module.exports = exports = {
 			console.log(req.body)
 			db.auth(req.body.email, req.body.password)
 			.then(function(auth) {
-				req.session.user_id = auth.id;
+				req.session.user_id = auth._id;
 				req.session.name = {first: auth.firstname, last: auth.lastname};
 				req.session.email = auth.email;
 				//resp.render('home', {name: req.session.name, email: req.session.email});
@@ -24,7 +24,7 @@ module.exports = exports = {
 			});
 		},
 		logout: function(req, resp, next) {
-			req.session = null;
+			req.session.destroy();
 			resp.json({status: 'ok'});
 		},
 		register: function(req, resp, next) {
@@ -41,7 +41,7 @@ module.exports = exports = {
 					
 					db.auth(req.body.email, req.body.password)
 					.then(function(auth) {
-						req.session.user_id = auth.id;
+						req.session.user_id = auth._id;
 						req.session.name = {first: auth.firstname, last: auth.lastname};
 						req.session.email = auth.email;
 						//resp.render('home', {name: req.session.name, email: req.session.email});
