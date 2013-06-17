@@ -68,9 +68,13 @@ script(type='text/ng-template', id='yo-product-detail-tpl')
       h3 {{item.name}}
       p {{item.desc}}
       p Price: ${{item.price}}
-      p Quantity: {{item.default_quantity}}
       p Size: {{item.default_width}}" X {{item.default_height}}"
-      p: a.btn.btn-primary(ng-click='add()') Add
+      p Quantity:
+        input.quantity(type='number', value='{{item.default_quantity}}')
+      p Total: ${{total}}
+      p 
+        a.add-btn.btn.btn-primary(ng-click='add()') Add
+        a.remove-btn.btn.hide(ng-click='remove()') Remove
 
 script(type='text/ng-template', id='yo-user-items-tpl')
   li: a(href='#/account') Account
@@ -91,5 +95,6 @@ script(type='text/ng-template', id='yo-checkout-items-tpl')
   div.media-body
     h4.media-heading {{item.name}}
     p Size: {{item.default_width}}" X {{item.default_height}}"
-    p Quantity: {{item.default_quantity}}
-    p Price: ${{item.price}}
+    p Quantity: {{item.quantity}}
+    p Price per unit: ${{item.price}}
+    p Total: ${{item.total}}

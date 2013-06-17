@@ -57,3 +57,15 @@
 }
 
 .message { text-align: center; }
+.quantity {
+  width: 30px;
+  margin-left: 10px;
+}
+.ellipsis {
+    width: 100%;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.basket_dropdown { width: 1em; }

@@ -2,8 +2,8 @@
 * Product service
 * Returns ngResource to interface with product API
 ********************************************************************/
-angular.module('YoApp.services.Products', ['ngResource']).
-	factory('service_products', ['$rootScope', '$resource', function(root, $resource) {
+angular.module('YoApp.services.Products', ['ngResource'])
+	.factory('service_products', ['$rootScope', '$resource', function(root, $resource) {
 		return $resource('/api/v0/products/:id', {id: '@id'});
 	}]);
 
@@ -11,8 +11,8 @@ angular.module('YoApp.services.Products', ['ngResource']).
 * Orders service
 * Returns ngResource to interface with orders API
 ********************************************************************/
-angular.module('YoApp.services.Orders', ['ngResource']).
-	factory('service_orders', ['$rootScope', '$resource', function(root, $resource) {
+angular.module('YoApp.services.Orders', ['ngResource'])
+	.factory('service_orders', ['$rootScope', '$resource', function(root, $resource) {
 		return $resource('/api/v0/orders/:id', {id: '@id'});
 	}]);
 
@@ -20,8 +20,8 @@ angular.module('YoApp.services.Orders', ['ngResource']).
 * Application Configuration
 * Returns a session class that manages the logged in user
 ********************************************************************/
-angular.module('YoApp.services.Session', []).
-	factory('service_session', ['$rootScope', function(root) {
+angular.module('YoApp.services.Session', [])
+	.factory('service_session', ['$rootScope', function(root) {
 		function Session() {
 			this.user = {};
 			this.token = '';
@@ -51,4 +51,45 @@ angular.module('YoApp.services.Session', []).
 		}
 
 		return new Session();
+	}]);
+
+/*******************************************************************
+* Shopping basket service
+* Returns an API to interface with basket items
+********************************************************************/
+angular.module('YoApp.services.Basket', [])
+	.factory('service_basket', ['$rootScope', function(root) {
+		function Basket() {
+			this._basket = [];
+		}
+
+		Basket.prototype.set = function(item) {
+			this._basket[item._id] = item;
+			return this;
+		}
+
+		Basket.prototype.get = function(id) {
+			return this._basket[id];
+		}
+
+		Basket.prototype.all = function() {
+			var b = [], self = this;
+
+			Object.keys(self._basket).forEach(function(k) {
+				b.push(self._basket[k]);
+			});
+
+			return b;
+		}
+
+		Basket.prototype.remove = function(id) {
+			return delete this._basket[id];
+		}
+
+		Basket.prototype.reset = function() {
+			this._basket = [];
+			return this;
+		}
+
+		return new Basket();
 	}]);

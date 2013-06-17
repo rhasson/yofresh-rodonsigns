@@ -6,6 +6,7 @@ var YoApp = angular.module('YoApp',
 	['YoApp.services.Products'
 	 , 'YoApp.services.Orders'
 	 , 'YoApp.services.Session'
+	 , 'YoApp.services.Basket'
 	 , 'ngSanitize'
 	]);
 
@@ -47,27 +48,27 @@ YoApp.config(function($routeProvider) {
 * All UI element controllers
 ********************************************************************/
 /* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session) {
+YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, service_basket) {
 	if (!service_session.isLoggedin()) window.location.href = '#/login';
 	else {
 		$rootScope.model = $rootScope.model || {};
 		$rootScope.model.user = $rootScope.model.user || service_session.get();
-		$rootScope.model.basket = $rootScope.model.basket || [];
+		$rootScope.model.basket = service_basket.all() || [];
 		$rootScope.model.products = $rootScope.model.products || [];
 
 		$('ul.nav').children().each(function(i,a){$(a).show()});
 		//$('i.icon-user').parent().append(' '+$scope.model.user.firstname);
 		//$('i.icon-basket-1').parent().append(' Basket');
-		console.log(service_session, $scope)
 	}
 });
 
 /* controller for handling logout */
-YoApp.controller('yoLogoutCtrl', function($scope, $rootScope, service_session) {
+YoApp.controller('yoLogoutCtrl', function($scope, $rootScope, service_session, service_basket) {
 	$.get('/logout')
 		.done(function(data) {
 			if (data.status === 'ok'){
 				service_session.logout();
+				service_basket.reset();
 				$rootScope.model = {};
 				$('ul.nav').children().each(function(i,a){$(a).hide()})
 				window.location.href = '#/';
@@ -157,20 +158,31 @@ YoApp.controller('yoProductCtrl', function($scope, service_session, service_prod
 });
 
 /* contoller for handling interactions with product details */
-YoApp.controller('yoProductDetailCtrl', function($scope) {
+YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 	$scope.add = function() {
-		console.log('details: ', $scope.model);
-		$scope.model.basket.push($scope.item);
+		console.log('adding: ', $scope);
+		var x = $scope.item;
+		x.quantity = $scope.new_quantity;
+		x.total = $scope.total;
+		service_basket.set(x);
+		$scope.model.basket = service_basket.all();
+	}
+
+	$scope.remove = function(id) {
+		console.log('removing: ', $scope.item);
+		service_basket.remove($scope.item._id);
+		$scope.model.basket = service_basket.all();
 	}
 });
 
 /* contoller for handling interactions with product details */
-YoApp.controller('yoBasketMenuCtrl', function($scope) {
+YoApp.controller('yoBasketMenuCtrl', function($scope, service_basket) {
 	console.log('BASKET: ', $scope)
+	//$scope.model.basket = service_basket.all();
 });
 
 /* contoller for handling interactions with product details */
-YoApp.controller('yoCheckoutCtrl', function($scope) {
+YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
 
 });
 
@@ -180,8 +192,22 @@ YoApp.controller('yoCheckoutCtrl', function($scope) {
 ********************************************************************/
 /* create product detail ui elements */
 YoApp.directive('yoProductDetail', function() {
+	var linkFn = function(scope, element, attrs) {
+		console.log('link change')
+		scope.new_quantity = scope.new_quantity || scope.item.default_quantity;
+
+		scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
+
+		$(element).find('.quantity').change(function() {
+			scope.new_quantity = $(this).val()
+			scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
+			scope.$apply();
+		});
+	}
+
 	return {
 		restrict: 'A',
+		link: linkFn,
 		templateUrl: 'yo-product-detail-tpl',
 		controller: 'yoProductDetailCtrl'
 	}
@@ -197,8 +223,13 @@ YoApp.directive('yoUserItems', function() {
 
 /* list products as they are added to the shipping basket */
 YoApp.directive('yoBasketItems', function() {
+	var linkFn = function(s, e, a) {
+		console.log(s);
+	}
+
 	return {
 		restrict: 'A',
+		link: linkFn,
 		transclude: true,
 		controller: 'yoBasketMenuCtrl',
 		templateUrl: 'yo-basket-items-tpl'
@@ -212,3 +243,9 @@ YoApp.directive('yoCheckoutItems', function() {
 		templateUrl: 'yo-checkout-items-tpl'
 	}
 });
+
+/*******************************************************************
+* Filters
+* 
+********************************************************************/
+

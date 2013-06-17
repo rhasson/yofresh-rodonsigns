@@ -11,7 +11,7 @@ div.navbar.navbar-fixed-top
         li.hide.dropdown
           a.dropdown-toggle(href="#", data-toggle="dropdown") Basket
             i.icon-basket-1
-          ul.dropdown-menu
-            li(ng-repeat='item in model.basket', data-yo-basket-items)
+          ul.dropdown-menu.basket_dropdown
+            ol.ellipsis(ng-repeat='item in model.basket', data-yo-basket-items)
             li.divider
             li: a(href='#/checkout') Checkout
