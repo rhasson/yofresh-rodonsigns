@@ -1,0 +1,9 @@
+div.navbar.navbar-fixed-top
+  div.navbar-inner
+    div.container
+      a.brand(href="#") YoFresh Admin Page
+      ul.nav.pull-right
+        li.hide.dropdown
+          a.dropdown-toggle(href="#", data-toggle="dropdown") {{model.user.firstname}}
+            i.icon-user
+          ul.dropdown-menu(data-yo-user-items)

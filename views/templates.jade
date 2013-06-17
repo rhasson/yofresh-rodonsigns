@@ -67,7 +67,7 @@ script(type='text/ng-template', id='yo-product-detail-tpl')
     div.caption
       h3 {{item.name}}
       p {{item.desc}}
-      p Price: {{item.price}}
+      p Price: ${{item.price}}
       p Quantity: {{item.default_quantity}}
       p Size: {{item.default_width}}" X {{item.default_height}}"
       p: a.btn.btn-primary(ng-click='add()') Add

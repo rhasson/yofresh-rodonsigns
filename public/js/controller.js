@@ -50,10 +50,10 @@ YoApp.config(function($routeProvider) {
 YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session) {
 	if (!service_session.isLoggedin()) window.location.href = '#/login';
 	else {
-		$rootScope.model = {};
-		$rootScope.model.user = service_session.get();
-		$rootScope.model.basket = [];
-		$rootScope.model.products = [];
+		$rootScope.model = $rootScope.model || {};
+		$rootScope.model.user = $rootScope.model.user || service_session.get();
+		$rootScope.model.basket = $rootScope.model.basket || [];
+		$rootScope.model.products = $rootScope.model.products || [];
 
 		$('ul.nav').children().each(function(i,a){$(a).show()});
 		//$('i.icon-user').parent().append(' '+$scope.model.user.firstname);
@@ -63,11 +63,12 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session) {
 });
 
 /* controller for handling logout */
-YoApp.controller('yoLogoutCtrl', function($scope, service_session) {
+YoApp.controller('yoLogoutCtrl', function($scope, $rootScope, service_session) {
 	$.get('/logout')
 		.done(function(data) {
 			if (data.status === 'ok'){
 				service_session.logout();
+				$rootScope.model = {};
 				$('ul.nav').children().each(function(i,a){$(a).hide()})
 				window.location.href = '#/';
 			}

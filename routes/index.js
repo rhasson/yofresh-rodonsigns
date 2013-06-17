@@ -16,6 +16,7 @@ module.exports = exports = {
 				req.session.user_id = auth._id;
 				req.session.name = {first: auth.firstname, last: auth.lastname};
 				req.session.email = auth.email;
+				req.session.group = auth.group;
 				//resp.render('home', {name: req.session.name, email: req.session.email});
 				resp.json(auth);
 			})
@@ -34,7 +35,8 @@ module.exports = exports = {
 					firstname: req.body.firstname,
 					lastname: req.body.lastname,
 					email: req.body.email,
-					password: req.body.password
+					password: req.body.password,
+					group: 'nobody'
 				})
 				.then(function(doc) {
 					//jobs.add('new user', {id: doc._id}).priority('high').save();
@@ -44,6 +46,7 @@ module.exports = exports = {
 						req.session.user_id = auth._id;
 						req.session.name = {first: auth.firstname, last: auth.lastname};
 						req.session.email = auth.email;
+						req.session.group = auth.group;
 						//resp.render('home', {name: req.session.name, email: req.session.email});
 						resp.json({status: 'ok'});
 					})
@@ -63,6 +66,13 @@ module.exports = exports = {
 				resp.render('home');
 			} else {
 				resp.render('home'); //, {laytou:false});
+			}
+		},
+		admin: function(req, resp, next) {
+			console.log(req.session)
+			if (req.session) {
+				if (req.session.group === 'admin') resp.render('admin');
+				else resp.render('home');
 			}
 		}
 	},

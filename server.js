@@ -38,6 +38,7 @@ server.get('/', routes.base.index);
 server.post('/login', routes.base.login);
 server.get('/logout', routes.base.logout);
 server.post('/register', routes.base.register);
+server.get('/admin', routes.base.admin);
 
 server.get('/api/v0/products', routes.api.v0.products.list);
 server.get('/api/v0/products/:id', routes.api.v0.products.list);

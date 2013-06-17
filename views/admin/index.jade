@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  div.row-fluid.main
+    form.form-horizontal.products(ng-controller='yoAdminCtrl')
+      div.control-group
+        label.control-label(for='product_name') Name:
+        div.controls
+          input(type='text', id='product_name', ng-model='product.name', required)
+      div.control-group
+        label.control-label(for='product_desc') Description:
+        div.controls
+          input(type='text', id='product_desc', ng-model='product.desc')
+      div.control-group
+        label.control-label(for='product_code') Code:
+        div.controls
+          input(type='text', id='product_code', ng-model='product.code', required)
+      div.control-group
+        label.control-label(for='product_size') Size:
+        div.controls
+          input(type='text', id='product_width', ng-model='product.default_width')"
+          p X 
+          input(type='text', id='product_height', ng-model='product.default_height')"
+      div.control-group
+        label.control-label(for='product_quantity') Default quantity:
+        div.controls
+          input(type='text', id='product_quantity', ng-model='product.default_quantity', required)
+      div.control-group
+        label.control-label(for='product_price') Price per unit:
+        div.controls
+          input(type='text', id='product_price', ng-model='product.price', required)
+      div.control-group
+        label.control-label(for='product_unit') Unit:
+        div.controls
+          input(type='text', id='product_unit', ng-model='product.unit', required)
+      div.control-group
+        div.controls
+          button.btn(type='submit', id='add_btn', ng-click='add()') Add
