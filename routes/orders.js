@@ -16,7 +16,20 @@ module.exports = exports = {
 	},
 	save: function(req, resp, next) {
 		if (req.session && 'name' in req.session) {
-			db.save('orders', req.session.user_id, req.body)
+			var items = req.body.items.map(function(v) {
+				v.product_id = v._id;
+				delete v._id;
+				delete v._rev;
+				delete v.$$hashKey;
+				return v;
+			});
+			var order = {
+				items: items
+				, subtotal: req.body.subtotal
+				, shipping: req.body.shipping
+			};
+
+			db.save('orders', req.session.user_id, order)
 			.then(function(doc) {
 				resp.json(doc);
 			})

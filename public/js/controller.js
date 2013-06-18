@@ -41,6 +41,10 @@ YoApp.config(function($routeProvider) {
 				templateUrl: 'yo-checkout-tpl',
 				controller: 'yoCheckoutCtrl'
 			});
+		.when('/orders', {
+				templateUrl: 'yo-orders-tpl',
+				controller: 'yoOrdersCtrl'
+			});
 });
 
 /*******************************************************************
@@ -160,18 +164,20 @@ YoApp.controller('yoProductCtrl', function($scope, service_session, service_prod
 /* contoller for handling interactions with product details */
 YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 	$scope.add = function() {
-		console.log('adding: ', $scope);
 		var x = $scope.item;
-		x.quantity = $scope.new_quantity;
-		x.total = $scope.total;
+		x.quantity = parseFloat($scope.new_quantity);
+		x.total = parseFloat($scope.total);
 		service_basket.set(x);
 		$scope.model.basket = service_basket.all();
 	}
 
 	$scope.remove = function(id) {
-		console.log('removing: ', $scope.item);
 		service_basket.remove($scope.item._id);
 		$scope.model.basket = service_basket.all();
+	}
+
+	$scope.get = function(id) {
+		return service_basket.get(id);
 	}
 });
 
@@ -182,8 +188,49 @@ YoApp.controller('yoBasketMenuCtrl', function($scope, service_basket) {
 });
 
 /* contoller for handling interactions with product details */
-YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
+YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orders) {
+	$scope.order = {
+		total: 0
+	    , subtotal: 0
+		, shipping: 25
+	};
 
+	var items = service_basket.all();
+
+	items.forEach(function(v) {
+		$scope.order.subtotal += v.total;
+	});
+
+	if (items.length) $scope.order.total = $scope.order.subtotal + $scope.order.shipping;
+	else $scope.order.shipping = 0;
+
+	$scope.cancel = function() {
+		service_basket.reset();
+		window.location.href = '#/home';
+	}
+
+	$scope.checkout = function() {
+		//doing checkout
+		var body = {
+			subtotal: $scope.order.subtotal
+			, shipping: $scope.order.shipping
+			, items: service_basket.all()
+		};
+
+		service_orders.save(JSON.stringify(body)
+			,function(data) {
+				console.log('Orders API: ', data);
+			}
+			,function(err) {
+				console.log('Orders API error: ', err);
+			});
+	}
+
+	$scope.goback = function() {
+		window.location.href = '#/home';
+	}
+
+	console.log('checkout: ', $scope)
 });
 
 /*******************************************************************
@@ -193,13 +240,14 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
 /* create product detail ui elements */
 YoApp.directive('yoProductDetail', function() {
 	var linkFn = function(scope, element, attrs) {
-		console.log('link change')
-		scope.new_quantity = scope.new_quantity || scope.item.default_quantity;
+		var b = scope.get(scope.item._id);
+		scope.new_quantity = parseFloat(scope.new_quantity) || parseFloat(scope.item.default_quantity);
+		if (b) scope.new_quantity = b.quantity;
 
 		scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
 
 		$(element).find('.quantity').change(function() {
-			scope.new_quantity = $(this).val()
+			scope.new_quantity = parseFloat($(this).val());
 			scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
 			scope.$apply();
 		});
@@ -209,6 +257,30 @@ YoApp.directive('yoProductDetail', function() {
 		restrict: 'A',
 		link: linkFn,
 		templateUrl: 'yo-product-detail-tpl',
+		controller: 'yoProductDetailCtrl'
+	}
+});
+
+/* create product detail ui elements */
+YoApp.directive('yoProductDetailShort', function() {
+	var linkFn = function(scope, element, attrs) {
+		var b = scope.get(scope.item._id);
+		scope.new_quantity = parseFloat(scope.new_quantity) || parseFloat(scope.item.default_quantity);
+		if (b) scope.new_quantity = b.quantity;
+
+		scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
+
+		$(element).find('.quantity').change(function() {
+			scope.new_quantity = parseFloat($(this).val());
+			scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
+			scope.$apply();
+		});
+	}
+
+	return {
+		restrict: 'A',
+		link: linkFn,
+		templateUrl: 'yo-product-detail-short-tpl',
 		controller: 'yoProductDetailCtrl'
 	}
 });
@@ -223,14 +295,8 @@ YoApp.directive('yoUserItems', function() {
 
 /* list products as they are added to the shipping basket */
 YoApp.directive('yoBasketItems', function() {
-	var linkFn = function(s, e, a) {
-		console.log(s);
-	}
-
 	return {
 		restrict: 'A',
-		link: linkFn,
-		transclude: true,
 		controller: 'yoBasketMenuCtrl',
 		templateUrl: 'yo-basket-items-tpl'
 	}
@@ -240,7 +306,8 @@ YoApp.directive('yoBasketItems', function() {
 YoApp.directive('yoCheckoutItems', function() {
 	return {
 		restrict: 'A',
-		templateUrl: 'yo-checkout-items-tpl'
+		controller: 'yoCheckoutCtrl',
+		templateUrl: 'yo-checkout-items-table-tpl'
 	}
 });
 

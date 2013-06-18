@@ -7,11 +7,11 @@ script(type='text/ng-template', id='yo-login-form-tpl')
         div.control-group
           label.control-label(for='iEmail') E-mail:
           div.controls
-            input(type='text', id='iEmail', placeholder='email address', ng-model='email', required)
+            input(type='text', id='iEmail', inputmode='email', placeholder='email address', ng-model='email', required)
         div.control-group
           label.control-label(for='iPassword') Password:
           div.controls
-            input(type='password', id='iPassword', ng-model='password', required)
+            input(type='password', id='iPassword', inputmode='verbatim', ng-model='password', required)
         div.control-group
           div.controls
             button.btn(type='submit', id='login_button', ng-click='login()') Login
@@ -30,19 +30,19 @@ script(type='text/ng-template', id='yo-register-form-tpl')
         div.control-group
           label.control-label(for='iFirstname') First name:
           div.controls
-            input(type='text', id='iFirstname', placeholder='first name', ng-model='firstname', required)
+            input(type='text', id='iFirstname', inputmode='verbatim', placeholder='first name', ng-model='firstname', required)
         div.control-group
           label.control-label(for='iLastname') Last name:
           div.controls
-            input(type='text', id='iLastname', placeholder='last name', ng-model='lastname', required)
+            input(type='text', id='iLastname', inputmode='verbatim', placeholder='last name', ng-model='lastname', required)
         div.control-group
           label.control-label(for='iEmail') E-mail:
           div.controls
-            input(type='text', id='iEmail', placeholder='email address', ng-model='email', required)
+            input(type='text', id='iEmail', inputmode='email', placeholder='email address', ng-model='email', required)
         div.control-group
           label.control-label(for='iPassword') Password:
           div.controls
-            input(type='password', id='iPassword', ng-model='password', required)
+            input(type='password', id='iPassword', inputmode='verbatim', ng-model='password', required)
         div.control-group
           div.controls
             button.btn(type='submit', id='reg_button', ng-click='register()') Register
@@ -56,38 +56,93 @@ script(type='text/ng-template', id='yo-logout-tpl')
   div Thank You!
 
 script(type='text/ng-template', id='yo-home-tpl')
-  div.span8(ng-controller='yoProductCtrl')
+  div.span3
+    ul.nav.nav-list.bs-docs-sidenav.affix
+      li: a(href='#/') Decals
+        i.icon-chevron-right
+      li: a(href='#/') Windows
+        i.icon-chevron-right
+  div.span9(ng-controller='yoProductCtrl')
     div.loading Loading...
-    ul.thumbnails
-      li.span4(ng-repeat='item in model.products', data-yo-product-detail)
+    ul.media-list
+      li.media(ng-repeat='item in model.products', data-yo-product-detail-short)
+
+script(type='text/ng-template', id='yo-product-detail-short-tpl')
+  a.pull-left(href='#')
+    img.media-object(src='img/1.png', width='120px', heigh='120px')
+  div.media-body
+    h4.media-heading {{item.name}}
+    p {{item.desc}}
+    p Size: {{item.default_width}}" X {{item.default_height}}"
+    p Quantity: 
+      input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
+    p Price: ${{item.price}}
+    p 
+      a.add-btn.btn.btn-primary(ng-click='add()') Add
+      a.remove-btn.btn.hide(ng-click='remove()') Remove
+  hr
 
 script(type='text/ng-template', id='yo-product-detail-tpl')
   div.thumbnail
-    img(data-src='holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;', src='')
+    img(data-src='js/holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;')
     div.caption
       h3 {{item.name}}
       p {{item.desc}}
       p Price: ${{item.price}}
       p Size: {{item.default_width}}" X {{item.default_height}}"
       p Quantity:
-        input.quantity(type='number', value='{{item.default_quantity}}')
+        input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
       p Total: ${{total}}
       p 
         a.add-btn.btn.btn-primary(ng-click='add()') Add
         a.remove-btn.btn.hide(ng-click='remove()') Remove
 
 script(type='text/ng-template', id='yo-user-items-tpl')
+  li: a(href='#/orders') Orders
   li: a(href='#/account') Account
   li: a(href='#/logout') Logout
 
 script(type='text/ng-template', id='yo-basket-items-tpl')
-  {{item.name}}
+  |- {{item.name}}
 
 script(type='text/ng-template', id='yo-checkout-tpl')
   div.span8
-    div.media(ng-repeat='item in model.basket', data-yo-checkout-items)
-  p: a.btn.btn-primary(href='#', ng-click='checkout()') Checkout
-  p: a.btn(href='#', ng-click='cancel()') Cancel
+    div.span8
+      table.table.table-striped
+        thead
+          tr
+            th Name
+            th Size
+            th Quantity
+            th $/unit
+            th Total
+        tbody
+          tr(ng-repeat='item in model.basket', data-yo-checkout-items)
+    div.row
+      div.span2.pull-right
+        table.table
+          tr
+            td Subtotal
+            td ${{order.subtotal}}
+          tr
+            td Shipping
+            td ${{order.shipping}}
+          tr
+            td Total
+            td ${{order.total}}
+    div.row
+      div.span3.pull-right
+        p
+          a.btn.btn-primary(href='#', ng-click='checkout()') Checkout
+          a.btn(href='#', ng-click='goback()') Go Back
+          a.btn(href='#', ng-click='cancel()') Cancel
+
+script(type='text/ng-template', id='yo-checkout-items-table-tpl')
+  td {{item.name}}
+  td {{item.default_width}}" X {{item.default_height}}"
+  td {{item.quantity}}
+  td ${{item.price}}
+  td ${{item.total}}
 
 script(type='text/ng-template', id='yo-checkout-items-tpl')
   a.pull-left(href='#')
@@ -98,3 +153,6 @@ script(type='text/ng-template', id='yo-checkout-items-tpl')
     p Quantity: {{item.quantity}}
     p Price per unit: ${{item.price}}
     p Total: ${{item.total}}
+
+script(type='text/ng-template', id='yo-orders-tpl')
+//// create order summary layout

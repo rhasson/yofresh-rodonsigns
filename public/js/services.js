@@ -64,7 +64,14 @@ angular.module('YoApp.services.Basket', [])
 		}
 
 		Basket.prototype.set = function(item) {
-			this._basket[item._id] = item;
+			var i; 
+			if (i = this._basket[item._id]) {
+				i.quantity += item.quantity;
+				i.total = i.quantity * parseFloat(i.price);
+			} else {
+				i = item;
+			}
+			this._basket[i._id] = i;
 			return this;
 		}
 
