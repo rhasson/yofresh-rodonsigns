@@ -82,21 +82,6 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
       a.remove-btn.btn.hide(ng-click='remove()') Remove
   hr
 
-script(type='text/ng-template', id='yo-product-detail-tpl')
-  div.thumbnail
-    img(data-src='js/holder.js/300x200', alt='300x200', style='width: 300px; height: 200px;')
-    div.caption
-      h3 {{item.name}}
-      p {{item.desc}}
-      p Price: ${{item.price}}
-      p Size: {{item.default_width}}" X {{item.default_height}}"
-      p Quantity:
-        input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
-      p Total: ${{total}}
-      p 
-        a.add-btn.btn.btn-primary(ng-click='add()') Add
-        a.remove-btn.btn.hide(ng-click='remove()') Remove
-
 script(type='text/ng-template', id='yo-user-items-tpl')
   li: a(href='#/orders') Orders
   li: a(href='#/account') Account
@@ -143,16 +128,6 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.quantity}}
   td ${{item.price}}
   td ${{item.total}}
-
-script(type='text/ng-template', id='yo-checkout-items-tpl')
-  a.pull-left(href='#')
-    img.media-object(data-src='holder.js/64x64', src='')
-  div.media-body
-    h4.media-heading {{item.name}}
-    p Size: {{item.default_width}}" X {{item.default_height}}"
-    p Quantity: {{item.quantity}}
-    p Price per unit: ${{item.price}}
-    p Total: ${{item.total}}
 
 script(type='text/ng-template', id='yo-orders-tpl')
 //// create order summary layout

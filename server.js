@@ -7,7 +7,8 @@ var Express = require('express')
     , server = Express()
 	, RedisStore = require('connect-redis')(Express)
     , store = new RedisStore
-    , routes = require('./routes');
+    , routes = require('./routes')
+    , proc = require('./worker/index.js');
 
 var SECRET = 'yofresh commerce site';
 
@@ -58,4 +59,9 @@ server.post('/api/v0/orders', routes.api.v0.orders.save);
 server.put('/api/v0/orders/:id', routes.api.v0.orders.update);
 server.delete('/api/v0/orders/:id', routes.api.v0.orders.remove);
 
-server.listen(80); //8002
+server.listen(80, function() {
+	var p = proc.startWorker();
+
+	console.log('Server started');
+	console.log('Child process started with PID: ', p.pid);
+}); //8002

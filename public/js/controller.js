@@ -40,7 +40,7 @@ YoApp.config(function($routeProvider) {
 		.when('/checkout', {
 				templateUrl: 'yo-checkout-tpl',
 				controller: 'yoCheckoutCtrl'
-			});
+			})
 		.when('/orders', {
 				templateUrl: 'yo-orders-tpl',
 				controller: 'yoOrdersCtrl'

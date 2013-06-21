@@ -39,7 +39,12 @@ module.exports = exports = {
 					group: 'nobody'
 				})
 				.then(function(doc) {
-					//jobs.add('new user', {id: doc._id}).priority('high').save();
+
+					jobs.add('registration confirmation', {
+						user_id: doc._id,
+						name: req.body.firstname,
+						email: req.body.email})
+					.priority('high').save();
 					
 					db.auth(req.body.email, req.body.password)
 					.then(function(auth) {
@@ -47,7 +52,7 @@ module.exports = exports = {
 						req.session.name = {first: auth.firstname, last: auth.lastname};
 						req.session.email = auth.email;
 						req.session.group = auth.group;
-						//resp.render('home', {name: req.session.name, email: req.session.email});
+
 						resp.json({status: 'ok'});
 					})
 					.fail(function(err) {
