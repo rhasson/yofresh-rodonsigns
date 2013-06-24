@@ -130,4 +130,12 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td ${{item.total}}
 
 script(type='text/ng-template', id='yo-orders-tpl')
-//// create order summary layout
+  div.span8
+    table.table.table-striped
+      tbody
+        tr(ng-repeat='order in model.orders', data-yo-orders-summary)
+
+script(type='text/ng-template', id='yo-orders-summary-items-tpl')
+  td {{formatDate(order.created_at)}}
+  td {{order.total}}
+  td {{order.status_message}}
