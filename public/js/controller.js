@@ -59,6 +59,7 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, ser
 		$rootScope.model.user = $rootScope.model.user || service_session.get();
 		$rootScope.model.basket = service_basket.all() || [];
 		$rootScope.model.products = $rootScope.model.products || [];
+		$rootScope.model.orders = $rootScope.model.orders || [];
 
 		$('ul.nav').children().each(function(i,a){$(a).show()});
 		//$('i.icon-user').parent().append(' '+$scope.model.user.firstname);
@@ -233,6 +234,35 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 	console.log('checkout: ', $scope)
 });
 
+/* contoller for handling interactions with product details */
+YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_session) {
+		var ps;
+		if (service_session.isLoggedin()) {
+		ps = service_orders.query({
+			} ,function() {
+				$scope.model.orders = ps;
+			} ,function() {
+				console.log('failed to load orders: ', ps)
+		});
+
+		$scope.status = function() {
+			//get more detail
+		}
+
+		$scope.cancel = function() {
+			//cancel order
+		}
+
+		$scope.formatDate = function(msg) {
+			var m = moment(msg);
+			return m.fromNow();
+		}
+
+		$scope.orderDetail = function() {
+
+		}
+}
+
 /*******************************************************************
 * Directives
 * All UI element directives
@@ -308,6 +338,31 @@ YoApp.directive('yoCheckoutItems', function() {
 		restrict: 'A',
 		controller: 'yoCheckoutCtrl',
 		templateUrl: 'yo-checkout-items-table-tpl'
+	}
+});
+
+/* list a summary of all orders */
+YoApp.directive('yoOrdersSummary', function() {
+	var linkFn = function(scope, el, attr) {
+		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
+			el.removeAttr('class');
+			el.addClass('warning');
+		}
+		if (scope.order.status_code >= 3 && scope.order.status_code <= 5) {
+			el.removeAttr('class');
+			el.addClass('success');
+		}
+		if (scope.order.status_code >= 6 && scope.order.status_code <= 9) {
+			el.removeAttr('class');
+			el.addClass('error');
+		}
+	};
+
+	return {
+		restrict: 'A',
+		controller: 'yoOrdersCtrl',
+		templateUrl: 'yo-orders-summary-items-tpl',
+		link: linkFn
 	}
 });
 
