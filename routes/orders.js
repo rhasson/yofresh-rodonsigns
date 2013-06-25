@@ -12,24 +12,20 @@ var db = require('../lib/db');
 * 3 - completed (order completed printing and is ready to be shipped)
 * 4 - shipped (shipping tracking number must be added to the order record)
 * 5 - paid
-* errors:
-* 0 - failed to create order
-* 1 - order was not accepted, containing errors and need further info
-* 2 - cannot ship because of incorrect shipping detail
-* 3 - payment problem
+* 6 - failed to create order
+* 7 - order was not accepted, containing errors and need further info
+* 8 - cannot ship because of incorrect shipping detail
+* 9 - payment problem
 ********************************************************************/
 
-var messages = [
+var status_messages = [
 	'Order submitted successfully'
 	, 'Order accepted and will begin processing'
 	, 'Order is being processed'
 	, 'Order has completed'
 	, 'Order has been shipped'
 	, 'Order is fully paid'
-];
-
-var errors = [
-	'Failed to create order'
+	, 'Failed to create order'
 	, 'Order was not accepted, more information is required'
 	, 'Cannot ship order due to incomplete information'
 	, 'There was a problem with processing the payment'
@@ -63,8 +59,10 @@ module.exports = exports = {
 				, subtotal: req.body.subtotal
 				, shipping: req.body.shipping
 				, total: req.body.subtotal + req.body.shipping
-				, status: 0
-				, status_message: messages[0]
+				, status_code: status_messages.indexOf(status_messages[0])
+				, status_message: status_messages[0]
+				, payment_created_at: ''
+				, payment_updated_at: ''
 			};
 
 			db.save('orders', req.session.user_id, order)

@@ -255,7 +255,11 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_sessio
 
 		$scope.formatDate = function(msg) {
 			var m = moment(msg);
-			return m.fromNow()
+			return m.fromNow();
+		}
+
+		$scope.orderDetail = function() {
+
 		}
 }
 
@@ -339,10 +343,26 @@ YoApp.directive('yoCheckoutItems', function() {
 
 /* list a summary of all orders */
 YoApp.directive('yoOrdersSummary', function() {
+	var linkFn = function(scope, el, attr) {
+		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
+			el.removeAttr('class');
+			el.addClass('warning');
+		}
+		if (scope.order.status_code >= 3 && scope.order.status_code <= 5) {
+			el.removeAttr('class');
+			el.addClass('success');
+		}
+		if (scope.order.status_code >= 6 && scope.order.status_code <= 9) {
+			el.removeAttr('class');
+			el.addClass('error');
+		}
+	};
+
 	return {
 		restrict: 'A',
 		controller: 'yoOrdersCtrl',
-		templateUrl: 'yo-orders-summary-items-tpl'
+		templateUrl: 'yo-orders-summary-items-tpl',
+		link: linkFn
 	}
 });
 
