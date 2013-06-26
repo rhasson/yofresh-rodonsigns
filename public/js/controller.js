@@ -237,31 +237,16 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 /* contoller for handling interactions with product details */
 YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_session) {
 		var ps;
-		if (service_session.isLoggedin()) {
+	if (service_session.isLoggedin()) {
 		ps = service_orders.query({
 			} ,function() {
 				$scope.model.orders = ps;
+				console.log('ps: ', ps)
 			} ,function() {
 				console.log('failed to load orders: ', ps)
 		});
-
-		$scope.status = function() {
-			//get more detail
-		}
-
-		$scope.cancel = function() {
-			//cancel order
-		}
-
-		$scope.formatDate = function(msg) {
-			var m = moment(msg);
-			return m.fromNow();
-		}
-
-		$scope.orderDetail = function() {
-
-		}
-}
+	}
+});
 
 /*******************************************************************
 * Directives
@@ -346,21 +331,35 @@ YoApp.directive('yoOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
 		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
 			el.removeAttr('class');
+			el.addClass('ng-scope');
 			el.addClass('warning');
 		}
 		if (scope.order.status_code >= 3 && scope.order.status_code <= 5) {
 			el.removeAttr('class');
+			el.addClass('ng-scope');
 			el.addClass('success');
 		}
 		if (scope.order.status_code >= 6 && scope.order.status_code <= 9) {
 			el.removeAttr('class');
+			el.addClass('ng-scope');
 			el.addClass('error');
 		}
 	};
 
 	return {
 		restrict: 'A',
-		controller: 'yoOrdersCtrl',
+		controller: ['$scope', '$element', function($scope, $el) {
+			$scope.formatDate = function(msg) {
+				var m = moment(msg);
+				return m.fromNow();
+			}
+
+			$scope.orderDetail = function() {
+				console.log('ask for more detail', $scope, $el)
+				//$($el).parent().append('<tr class="order_detail"></tr><td>Here is some more details.<ul>'+
+				//	'<li>item 1</li><li>item 2</li><li>item 3</li></ul></td>').slideDown('fast');
+			}
+		}],
 		templateUrl: 'yo-orders-summary-items-tpl',
 		link: linkFn
 	}

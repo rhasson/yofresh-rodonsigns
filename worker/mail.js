@@ -5,7 +5,6 @@ var jade = require('jade')
 
 function Mail() {
     this._body = {
-        key: "",
         message: {
             html: "",
             text: "",
@@ -45,9 +44,9 @@ function Mail() {
                 }
             ]
         },
-        async: true,
-        ip_pool: "Main Pool"
+        async: true
     };
+    this._templates = [];
 }
 
 /*
@@ -64,21 +63,21 @@ Mail.prototype.create_registration = function(fields) {
         , self = this
         , def = Q.defer();
 
-    if (typeof self.registration_tpl !== 'function') {
+    if (typeof self._templates['registration_confirmation'] !== 'function') {
         fs.readFile(path, {encoding: 'utf8'}, function(e, t) {
             console.log(e)
             if (!e) {
-                self.registration_tpl = jade.compile(t);
-                body = render(self.registration_tpl, self._body, fields);
-                def.resolve(JSON.stringify(body));
+                self._templates['registration_confirmation'] = jade.compile(t);
+                body = render(self._templates['registration_confirmation'], self._body, fields);
+                def.resolve(body);
             } else {
                 body = render(null, self._body, fields);
-                def.resolve(JSON.stringify(body));
+                def.resolve(body);
             }
         });
     } else {
-        body = render(self.registration_tpl, self._body, fields);
-        def.resolve(JSON.stringify(body));
+        body = render(self._templates['registration_confirmation'], self._body, fields);
+        def.resolve(body);
     }
 
     function render(fn, body, fields) {
@@ -105,6 +104,67 @@ Mail.prototype.create_registration = function(fields) {
         b.message.to[0].email = fields.email;
         b.message.to[0].name = fields.name;
         b.message.recipient_metadata[0].rcpt = fields.email;
+        b.message.recipient_metadata[0].values.user_id = fields.user_id;
+
+        return (b);
+    }
+
+    return def.promise;
+}
+
+Mail.prototype.create_new_order = function(fields) {
+    var def = Q.defer()
+        , self = this
+        , path = process.cwd() + '/worker/tpls/new-order.jade'
+        , tpl = ''
+        , body;
+
+    if (typeof self._templates['new_order'] !== 'function') {
+        fs.readFile(path, {encoding: 'utf8'}, function(e, t) {
+            console.log(e)
+            if (!e) {
+                self._templates['new_order'] = jade.compile(t);
+                body = render(self._templates['new_order'], self._body, fields);
+                def.resolve(body);
+            } else {
+                body = render(null, self._body, fields);
+                def.resolve(body);
+            }
+        });
+    } else {
+        body = render(self._templates['new_order'], self._body, fields);
+        def.resolve(body);
+    }
+
+    function render(fn, body, fields) {
+        var tpl = '';
+        var b = {};
+
+        util._extend(b, body);
+
+        if (fn && typeof fn === 'function') tpl = fn(fields);
+        else {
+            tpl = 
+                'New Order Confirmation\r\n\r\n' +
+                fields.user.name + ' thank you for placing an order with YoFresh@RodonSigns.\n' +
+                'Your order confirmation number is: ' + fields.confirmation_number + ' \r\n\r\n' +
+                'Order Summary:\n';
+            fields.items.forEach(function(v) {
+                tpl += v.name + ' - quantity of: ' + v.quantity + ' - total: $' + v.total; 
+            });
+
+            tpl += '\r\n\r\n' +
+                    'total payment: $' + fields.total;
+            tpl += '\r\n\r\n' +
+                'If you have any questions don\'t hesitate to email or call us any time.\n' +
+                'Email: sales@rodonsigns.com and Phone: 215-885-5358\r\n';
+        }
+
+        (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;
+        b.message.subject = 'YoFresh@RodonSigns Order Confirmation';
+        b.message.to[0].email = fields.user.email;
+        b.message.to[0].name = fields.user.name;
+        b.message.recipient_metadata[0].rcpt = fields.user.email;
         b.message.recipient_metadata[0].values.user_id = fields.user_id;
 
         return (b);

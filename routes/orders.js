@@ -1,5 +1,7 @@
-var db = require('../lib/db');
-
+var db = require('../lib/db')
+ 	, kue = require('kue')
+ 	, jobs = kue.createQueue()
+ 	, crypto = require('crypto');
 /*******************************************************************
 * Orders service
 * REST API for order processing
@@ -46,6 +48,10 @@ module.exports = exports = {
 		}
 	},
 	save: function(req, resp, next) {
+		var s = crypto.createHash('md5');
+		var d;
+		s.update((Math.floor((Math.random() * 999888))).toString());
+		
 		if (req.session && 'name' in req.session) {
 			var items = req.body.items.map(function(v) {
 				v.product_id = v._id;
@@ -55,7 +61,7 @@ module.exports = exports = {
 				return v;
 			});
 			var order = {
-				items: items
+				  items: items
 				, subtotal: req.body.subtotal
 				, shipping: req.body.shipping
 				, total: req.body.subtotal + req.body.shipping
@@ -63,10 +69,25 @@ module.exports = exports = {
 				, status_message: status_messages[0]
 				, payment_created_at: ''
 				, payment_updated_at: ''
+				, confirmation_number: s.digest('hex')
 			};
 
 			db.save('orders', req.session.user_id, order)
 			.then(function(doc) {
+				var j;
+				d = {
+					  user_id: req.session.user_id
+					, name: req.session.name.first
+					, email: req.session.email
+					, order_id: doc._id
+				};
+				
+				j = jobs.create('order confirmation', d);
+				j.on('failed', function(e) {
+					console.log('JOB FAILED: ', e);
+				});
+				j.save();
+				
 				resp.json(doc);
 			})
 			.fail(function(err) {

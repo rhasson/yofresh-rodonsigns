@@ -9,22 +9,55 @@ var mailchimp = require('mailchimp').MandrillAPI
     , Q = require('q')
   	, kue = require('kue')
   	, jobs = kue.createQueue()
-  	, mail = require('./mail');
+  	, mail = require('./mail')
+    , db = require('../lib/db');
 
 jobs.process('registration confirmation', 2, function(job, done) {
-	mail.create_registration(job)
+	mail.create_registration(job.data)
 	.then(function(data) {
-		Q.ninvoke(mailchimp, 'messages_send', data)
+		Q.ninvoke(api, 'messages_send', data)
 		.then(function(resp) {
-			done(data);
+      console.log('completed sending mail: ', resp);
+			done();
 		})
 		.fail(function(err) {
-			done(err);
+			console.log('registration confirmation worker: failed to send mail');
+      done(err);
 		});
 	})
 	.fail(function(err) {
 		done(err);
 	});
+});
+
+jobs.process('order confirmation', 2, function(job, done) {
+  db.get('orders', job.data.order_id)
+  .then(function(doc) {
+    doc.user = {
+      name: job.data.name,
+      email: job.data.email
+    };
+    mail.create_new_order(doc)
+    .then(function(data) {
+      Q.ninvoke(api, 'messages_send', data)
+      .then(function(resp) {
+        console.log('completed sending mail: ', resp);
+        done();
+      })
+      .fail(function(err) {
+        console.log('new order worker: failed to send mail ', err);
+        done(err);
+      });
+    })
+    .fail(function(err) {
+      console.log('new order worker: failed to create mail template');
+      done(err);
+    });
+  })
+  .fail(function(err) {
+    console.log('new order worker: failed to get order detail from db ', err);
+    done(err);
+  })
 });
 
 process.on('disconnect', function() {

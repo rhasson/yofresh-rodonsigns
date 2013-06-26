@@ -134,6 +134,7 @@ script(type='text/ng-template', id='yo-orders-tpl')
     table.table.table-striped
       thead
         tr
+          th Confirmation #
           th Created on
           th Payment taken
           th Order Status
@@ -141,7 +142,8 @@ script(type='text/ng-template', id='yo-orders-tpl')
         tr(ng-repeat='order in model.orders', data-yo-orders-summary)
 
 script(type='text/ng-template', id='yo-orders-summary-items-tpl')
-  td 
-    a(ng-click='orderDetail()') {{formatDate(order.created_at)}}
+  td
+    a(ng-click='orderDetail()') {{order.confirmation_number}}
+  td {{formatDate(order.created_at)}}
   td ${{order.total}}
   td {{order.status_message}}

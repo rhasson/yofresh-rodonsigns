@@ -44,7 +44,7 @@ module.exports = exports = {
 						user_id: doc._id,
 						name: req.body.firstname,
 						email: req.body.email})
-					.priority('high').save();
+					.save();
 					
 					db.auth(req.body.email, req.body.password)
 					.then(function(auth) {
