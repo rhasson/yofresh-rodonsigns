@@ -5,15 +5,16 @@ module.exports = exports = {
 		if (req.session && 'name' in req.session) {
 			db.get('users', req.params.id || null)
 			.then(function(user) {
-				var u;
-				if (user instanceof Array) u = user.length ? user[0] : {};
-				if (!(_id in u)) resp.json({error: { code: 0, message: 'user not found'}});
+				var u = (user instanceof Array) ? (user.length ? user[0] : {}) : user;
+
+				if (!('_id' in u)) resp.json({error: { code: 0, message: 'user not found'}});
 				else {
 					delete user.password;
 					resp.json(user);
 				}
 			})
 			.fail(function(err) {
+				console.log('USERS: ', err);
 				resp.json({error: {code: 0, message: 'failed to retreive user'}});
 			})
 		} else {

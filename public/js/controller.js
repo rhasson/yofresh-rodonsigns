@@ -7,6 +7,7 @@ var YoApp = angular.module('YoApp',
 	 , 'YoApp.services.Orders'
 	 , 'YoApp.services.Session'
 	 , 'YoApp.services.Basket'
+	 , 'YoApp.services.Accounts'
 	 , 'ngSanitize'
 	]);
 
@@ -44,6 +45,10 @@ YoApp.config(function($routeProvider) {
 		.when('/orders', {
 				templateUrl: 'yo-orders-tpl',
 				controller: 'yoOrdersCtrl'
+			})
+		.when('/account', {
+				templateUrl: 'yo-accounts-tpl',
+				controller: 'yoAccountsCtrl'
 			});
 });
 
@@ -149,7 +154,7 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 });
 
 /* product list controller to retreive all products from db */
-YoApp.controller('yoProductCtrl', function($scope, service_session, service_products) {
+YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, service_products) {
 	var ps;
 	if (service_session.isLoggedin()) {
 		ps = service_products.query({
@@ -221,6 +226,7 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 		service_orders.save(JSON.stringify(body)
 			,function(data) {
 				console.log('Orders API: ', data);
+				service_basket.reset();
 			}
 			,function(err) {
 				console.log('Orders API error: ', err);
@@ -231,7 +237,6 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 		window.location.href = '#/home';
 	}
 
-	console.log('checkout: ', $scope)
 });
 
 /* contoller for handling interactions with product details */
@@ -245,6 +250,25 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_sessio
 			} ,function() {
 				console.log('failed to load orders: ', ps)
 		});
+	}
+});
+
+/* contoller for handling customer account details */
+YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_session) {
+		var ps;
+	if (service_session.isLoggedin()) {
+		ps = service_accounts.get({id: $scope.model.user._id
+			} ,function() {
+				$scope.model.account = ps;
+				console.log('account: ', ps)
+			} ,function() {
+				console.log('failed to load account: ', ps)
+		});
+	}
+
+	$scope.formatDate = function(msg) {
+		var m = moment(msg);
+		return m.fromNow();
 	}
 });
 
@@ -365,6 +389,14 @@ YoApp.directive('yoOrdersSummary', function() {
 	}
 });
 
+/* show user account summary */
+YoApp.directive('yoAccountSummary', function() {
+	return {
+		restrict: 'A'
+		//controller: 'yoAccountsCtrl'
+		//templateUrl: 'yo-accounts-tpl'
+	}
+});
 /*******************************************************************
 * Filters
 * 

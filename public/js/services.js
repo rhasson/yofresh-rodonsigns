@@ -17,37 +17,75 @@ angular.module('YoApp.services.Orders', ['ngResource'])
 	}]);
 
 /*******************************************************************
-* Application Configuration
+* Accounts service
+* Returns ngResource to interface with customer account API
+********************************************************************/
+angular.module('YoApp.services.Accounts', ['ngResource'])
+	.factory('service_accounts', ['$rootScope', '$resource', function(root, $resource) {
+		return $resource('/api/v0/users/:id', {id: '@id'});
+	}]);
+
+/*******************************************************************
+* Application session service
 * Returns a session class that manages the logged in user
 ********************************************************************/
 angular.module('YoApp.services.Session', [])
 	.factory('service_session', ['$rootScope', function(root) {
 		function Session() {
-			this.user = {};
-			this.token = '';
-			this.loggedIn = false;
+			this.storage = lStorage();
 		}
 		
 		Session.prototype.isLoggedin = function(){
-			return this.loggedIn;
+			return this.storage.flag();
 		}
 
 		Session.prototype.logout = function() {
-			this.user = {};
-			this.token = ''
-			this.loggedIn = false;
+			this.storage.clear();
 		}
 
 		Session.prototype.set = function(user) {
 			if (user._id) {
-				this.token = user._id;
-				this.user = user;
-				this.loggedIn = true;
+				this.storage.set(user);
 			}
 		}
 
 		Session.prototype.get = function() {
-			return this.user;
+			return this.storage.get();
+		}
+
+		function lStorage(name) {
+			return new function() {
+				this.name = name || 'yoSession';
+				this.cache = {};
+
+				this.set = function(user) {
+					if (window.localStorage) window.localStorage.setItem(this.name, JSON.stringify(user));
+					else this.cache[this.name] = JSON.stringify(user);
+				}
+
+				this.get = function() {
+					var t, d;
+					if (window.localStorage) t = window.localStorage.getItem(this.name);
+					else t = this.cache[name]
+
+					try {
+						d = JSON.parse(t);
+						return d;
+					} catch(e) {
+						return null;
+					}
+				}
+
+				this.clear = function() {
+					if (window.localStorage) window.localStorage.clear();
+					else this.cache = {};
+				}
+
+				this.flag = function() {
+					if (window.localStorage) return !!window.localStorage.key(this.name);
+					else return !!Object.keys(this.cache).length;
+				}
+			}
 		}
 
 		return new Session();

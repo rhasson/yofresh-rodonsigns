@@ -147,3 +147,48 @@ script(type='text/ng-template', id='yo-orders-summary-items-tpl')
   td {{formatDate(order.created_at)}}
   td ${{order.total}}
   td {{order.status_message}}
+
+script(type='text/ng-template', id='yo-accounts-tpl')
+  div.span3
+  div.span6(data-yo-account-summary)
+    h2 Account Information
+    h4 Last updated: {{formatDate(model.account.modified_at)}}
+    div.well
+      div.message.alert.alert-error.hide
+      form.form-horizontal
+        div.control-group
+          label.control-label(for='iFirstname') First name:
+          div.controls
+            input(type='text', id='iFirstname', inputmode='verbatim', placeholder='first name', ng-model='model.account.firstname', required)
+        div.control-group
+          label.control-label(for='iLastname') Last name:
+          div.controls
+            input(type='text', id='iLastname', inputmode='verbatim', placeholder='last name', ng-model='model.account.lastname', required)
+        div.control-group
+          label.control-label(for='iEmail') E-mail:
+          div.controls
+            input(type='text', id='iEmail', inputmode='email', placeholder='email address', ng-model='model.account.email', required)
+
+        fieldset: legend Shipping Address
+          div.control-group
+            label.control-label(for='iAddress') Address:
+            div.controls
+              input(type='text', id='iAddress', inputmode='verbatim', placeholder='street address', ng-model='model.account.address')
+          div.control-group
+            label.control-label(for='iCity') City:
+            div.controls
+              input(type='text', id='iCity', inputmode='verbatim', placeholder='City', ng-model='model.account.city')
+          div.control-group
+            label.control-label(for='iState') State:
+            div.controls
+              input(type='text', id='iState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.state')
+          div.control-group
+            label.control-label(for='iZip') Zip Code:
+            div.controls
+              input(type='text', id='iZip', inputmode='number', placeholder='Zip code', ng-model='model.account.zip')
+
+        div.control-group
+          div.controls
+            button.btn(type='submit', id='user_update_button', ng-click='account_update()') Save
+            button.btn(type='cancel', id='user_cancel_button', ng-click='account_cancel()') Go Back
+  div.span3
