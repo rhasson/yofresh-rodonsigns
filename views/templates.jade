@@ -118,9 +118,9 @@ script(type='text/ng-template', id='yo-checkout-tpl')
     div.row
       div.span3.pull-right
         p
-          a.btn.btn-primary(href='#', ng-click='checkout()') Checkout
-          a.btn(href='#', ng-click='goback()') Go Back
-          a.btn(href='#', ng-click='cancel()') Cancel
+          a.btn.btn-primary(href='#/final') Checkout
+          a.btn(href='#/home') Go Back
+          a.btn(ng-click='cancel()') Cancel
 
 script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.name}}
@@ -128,6 +128,43 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.quantity}}
   td ${{item.price}}
   td ${{item.total}}
+
+script(type='text/ng-template', id='yo-checkout-final-tpl')
+  div.span8
+    div.span6.well
+      h4 Confirm shipping address
+      form.form-horizontal
+        div.control-group
+          label.control-label(for='iAddress') Address:
+          div.controls
+            input(type='text', id='iAddress', inputmode='verbatim', placeholder='street address', ng-model='model.account.address')
+        div.control-group
+          label.control-label(for='iCity') City:
+          div.controls
+            input(type='text', id='iCity', inputmode='verbatim', placeholder='City', ng-model='model.account.city')
+        div.control-group
+          label.control-label(for='iState') State:
+          div.controls
+            input(type='text', id='iState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.state')
+        div.control-group
+          label.control-label(for='iZip') Zip Code:
+          div.controls
+            input(type='text', id='iZip', inputmode='number', placeholder='Zip code', ng-model='model.account.zip')
+      h4 Continue to checkout
+      div.row
+        div.span6
+          table.table
+            tr
+              td Subtotal
+              td ${{order.subtotal}}
+            tr
+              td Shipping
+              td ${{order.shipping}}
+            tr
+              td Total
+              td ${{order.total}}
+          form.stripe_form
+            script(src='https://checkout.stripe.com/v2/checkout.js', data-yo-stripe-form)
 
 script(type='text/ng-template', id='yo-orders-tpl')
   div.span8

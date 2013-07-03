@@ -41,23 +41,30 @@ server.get('/logout', routes.base.logout);
 server.post('/register', routes.base.register);
 server.get('/admin', routes.base.admin);
 
+server.post('/charge', routes.api.v0.payments.charge);
+
 server.get('/api/v0/products', routes.api.v0.products.list);
 server.get('/api/v0/products/:id', routes.api.v0.products.list);
 server.post('/api/v0/products', routes.api.v0.products.save);
-server.put('/api/v0/products/:id', routes.api.v0.products.update);
+server.post('/api/v0/products/:id', routes.api.v0.products.update);
 server.delete('/api/v0/products/:id', routes.api.v0.products.remove);
 
 server.get('/api/v0/users', routes.api.v0.users.list);
 server.get('/api/v0/users/:id', routes.api.v0.users.list);
 server.post('/api/v0/users', routes.api.v0.users.save);
-server.put('/api/v0/users/:id', routes.api.v0.users.update);
+server.post('/api/v0/users/:id', routes.api.v0.users.update);
 server.delete('/api/v0/users/:id', routes.api.v0.users.remove);
 
 server.get('/api/v0/orders', routes.api.v0.orders.list);
 server.get('/api/v0/orders/:id', routes.api.v0.orders.list);
 server.post('/api/v0/orders', routes.api.v0.orders.save);
-server.put('/api/v0/orders/:id', routes.api.v0.orders.update);
+server.post('/api/v0/orders/:id', routes.api.v0.orders.update);
 server.delete('/api/v0/orders/:id', routes.api.v0.orders.remove);
+
+server.get('/api/v0/users', routes.api.v0.users.list);
+server.get('/api/v0/users/:id', routes.api.v0.users.list);
+server.post('/api/v0/users', routes.api.v0.users.save);
+server.post('/api/v0/users/:id', routes.api.v0.users.update);
 
 server.listen(80, function() {
 	var p = proc.startWorker();

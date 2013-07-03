@@ -15,7 +15,7 @@ var YoApp = angular.module('YoApp',
 * Application Configuration
 *
 ********************************************************************/
-YoApp.config(function($routeProvider) {
+YoApp.config(function($routeProvider, $locationProvider) {
 /* Page router configuration */
 	$routeProvider
 		.when('/', {
@@ -49,7 +49,13 @@ YoApp.config(function($routeProvider) {
 		.when('/account', {
 				templateUrl: 'yo-accounts-tpl',
 				controller: 'yoAccountsCtrl'
+			})
+		.when('/final', {
+				templateUrl: 'yo-checkout-final-tpl',
+				controller: 'yoCheckoutCtrl'
 			});
+
+	//$locationProvider.html5Mode(true);
 });
 
 /*******************************************************************
@@ -194,8 +200,10 @@ YoApp.controller('yoBasketMenuCtrl', function($scope, service_basket) {
 });
 
 /* contoller for handling interactions with product details */
-YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orders) {
-	$scope.order = {
+YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_basket, service_orders, service_accounts) {
+	var ps;
+
+	$scope.order = $scope.order || {
 		total: 0
 	    , subtotal: 0
 		, shipping: 25
@@ -210,6 +218,16 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 	if (items.length) $scope.order.total = $scope.order.subtotal + $scope.order.shipping;
 	else $scope.order.shipping = 0;
 
+	if (service_session.isLoggedin() && !$scope.model.account) {
+		ps = service_accounts.get({id: $scope.model.user._id
+			} ,function() {
+				$scope.model.account = ps;
+				console.log('account: ', ps)
+			} ,function() {
+				console.log('failed to load account: ', ps)
+		});
+	}
+
 	$scope.cancel = function() {
 		service_basket.reset();
 		window.location.href = '#/home';
@@ -217,7 +235,7 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 
 	$scope.checkout = function() {
 		//doing checkout
-		var body = {
+		/*var body = {
 			subtotal: $scope.order.subtotal
 			, shipping: $scope.order.shipping
 			, items: service_basket.all()
@@ -230,13 +248,8 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket, service_orde
 			}
 			,function(err) {
 				console.log('Orders API error: ', err);
-			});
+			});*/
 	}
-
-	$scope.goback = function() {
-		window.location.href = '#/home';
-	}
-
 });
 
 /* contoller for handling interactions with product details */
@@ -255,7 +268,7 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_sessio
 
 /* contoller for handling customer account details */
 YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_session) {
-		var ps;
+	var ps;
 	if (service_session.isLoggedin()) {
 		ps = service_accounts.get({id: $scope.model.user._id
 			} ,function() {
@@ -269,6 +282,22 @@ YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_se
 	$scope.formatDate = function(msg) {
 		var m = moment(msg);
 		return m.fromNow();
+	}
+
+	$scope.account_update = function() {
+		$scope.model.account.id = $scope.model.account._id;
+		$scope.model.account.$save(function(resp) {
+			if ('error' in resp) {
+				console.log('error saving account info: ', resp);
+			} else {
+				console.log('account info saved: ', resp);
+			}
+		});
+
+	}
+
+	$scope.account_cancel = function() {
+		window.location.href = '#/home';
 	}
 });
 
@@ -397,6 +426,33 @@ YoApp.directive('yoAccountSummary', function() {
 		//templateUrl: 'yo-accounts-tpl'
 	}
 });
+
+/* include stripe payment form */
+YoApp.directive('yoStripeForm', function() {
+	var linkFn = function(scope, el, attr) {
+		$('.stripe_form').on('submit', function(evt) {
+			console.log('submited', evt);
+		});
+
+		el.attr({
+		    class: 'stripe-button'
+		  , 'data-key': 'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
+		  , 'data-amount': scope.order.total+'00'
+		  , 'data-name': 'YoFresh@RodonSigns'
+		  , 'data-description': ''
+		  , 'data-currency': 'usd'
+		  , 'data-image': '/img/logo.png'
+		});
+	}
+
+	return {
+		restrict: 'A',
+		controller: 'yoCheckoutCtrl',
+		link: linkFn
+	}
+});
+
+
 /*******************************************************************
 * Filters
 * 

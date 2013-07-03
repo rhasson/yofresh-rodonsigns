@@ -1,6 +1,7 @@
 var Users = require('./users')
  	, Products = require('./products')
  	, Orders = require('./orders')
+ 	, Payments = require('./payments')
  	, db = require('../lib/db')
  	, crypto = require('crypto')
  	, kue = require('kue')
@@ -85,7 +86,8 @@ module.exports = exports = {
 		v0: {
 			products: Products, 
 			users: Users,
-			orders: Orders
+			orders: Orders,
+			payments: Payments
 		}
 	}
 }

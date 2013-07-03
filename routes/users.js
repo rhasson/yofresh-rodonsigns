@@ -25,7 +25,10 @@ module.exports = exports = {
 		next();
 	},
 	update: function(req, resp, next) {
-		if (req.session && 'name' in req.session && req.params.id === req.session.user_id) {			
+		if (req.session && 'name' in req.session && req.params.id === req.session.user_id) {
+			console.log(req.params, req.body)
+			delete req.body._id;
+			delete req.body._rev;
 			db.update('users', req.params.id, req.body)
 			.then(function(doc) {
 				resp.json(doc);	
