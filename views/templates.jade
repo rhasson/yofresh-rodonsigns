@@ -132,6 +132,7 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
 script(type='text/ng-template', id='yo-checkout-final-tpl')
   div.span8
     div.span6.well
+      div.message.alert.alert-error.hide
       h4 Confirm shipping address
       form.form-horizontal
         div.control-group
@@ -163,8 +164,8 @@ script(type='text/ng-template', id='yo-checkout-final-tpl')
             tr
               td Total
               td ${{order.total}}
-          form.stripe_form
-            script(src='https://checkout.stripe.com/v2/checkout.js', data-yo-stripe-form)
+          div
+            button.btn.btn-primary(data-yo-stripe-form) Buy
 
 script(type='text/ng-template', id='yo-orders-tpl')
   div.span8

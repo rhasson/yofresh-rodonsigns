@@ -1,7 +1,8 @@
 var db = require('../lib/db')
  	, kue = require('kue')
  	, jobs = kue.createQueue()
- 	, crypto = require('crypto');
+ 	, crypto = require('crypto')
+ 	, stripe = require('stripe')(require('../config').config.stripe.test_secret);
 /*******************************************************************
 * Orders service
 * REST API for order processing
@@ -67,31 +68,43 @@ module.exports = exports = {
 				, total: req.body.subtotal + req.body.shipping
 				, status_code: status_messages.indexOf(status_messages[0])
 				, status_message: status_messages[0]
-				, payment_created_at: ''
-				, payment_updated_at: ''
+				, stripe_token_id: req.body.stripe_token_id
+				, payment_created_at: new Date().toJSON()
+				, payment_updated_at: new Date().toJSON()
 				, confirmation_number: s.digest('hex')
 			};
 
-			db.save('orders', req.session.user_id, order)
-			.then(function(doc) {
-				var j;
-				d = {
-					  user_id: req.session.user_id
-					, name: req.session.name.first
-					, email: req.session.email
-					, order_id: doc._id
-				};
-				
-				j = jobs.create('order confirmation', d);
-				j.on('failed', function(e) {
-					console.log('JOB FAILED: ', e);
-				});
-				j.save();
-				
-				resp.json(doc);
-			})
-			.fail(function(err) {
-				resp.json({error: {code: 0, message: 'failed to save product'}});
+			stripe.customers.create({
+				card: order.stripe_token_id
+				, email: req.session.email
+			}, function(err, customer) {
+				if (!err) {
+					order.stripe_customer_id = customer.id;
+					db.save('orders', req.session.user_id, order)
+					.then(function(doc) {
+						var j;
+						d = {
+							  user_id: req.session.user_id
+							, name: req.session.name.first
+							, email: req.session.email
+							, order_id: doc._id
+						};
+						
+						j = jobs.create('order confirmation', d);
+						j.on('failed', function(e) {
+							console.log('JOB FAILED: ', e);
+						});
+						j.save();
+						
+						resp.json(doc);
+					})
+					.fail(function(err) {
+						resp.json({error: {code: 0, message: 'failed to save product'}});
+					});
+				} else {
+					console.log('stripe customer create: ', err);
+					resp.json({error: {code: 0, message: 'failed to create customer based on purchase id'}});
+				}
 			});
 		} else {
 			resp.json({error: {code: 0, message: 'no valid session present'}});

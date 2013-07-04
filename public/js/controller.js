@@ -202,8 +202,9 @@ YoApp.controller('yoBasketMenuCtrl', function($scope, service_basket) {
 /* contoller for handling interactions with product details */
 YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_basket, service_orders, service_accounts) {
 	var ps;
+	$('div.message').hide().removeClass('hide');
 
-	$scope.order = $scope.order || {
+	$scope.order = {
 		total: 0
 	    , subtotal: 0
 		, shipping: 25
@@ -212,13 +213,14 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 	var items = service_basket.all();
 
 	items.forEach(function(v) {
+		console.log(v)
 		$scope.order.subtotal += v.total;
 	});
 
 	if (items.length) $scope.order.total = $scope.order.subtotal + $scope.order.shipping;
 	else $scope.order.shipping = 0;
 
-	if (service_session.isLoggedin() && !$scope.model.account) {
+	if (service_session.isLoggedin() && ('model' in $scope)) {
 		ps = service_accounts.get({id: $scope.model.user._id
 			} ,function() {
 				$scope.model.account = ps;
@@ -233,22 +235,27 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 		window.location.href = '#/home';
 	}
 
-	$scope.checkout = function() {
+	$scope.saveStripeIdToDb = function(token) {
 		//doing checkout
-		/*var body = {
+
+		console.log('ID: ',token.id)
+		var body = {
 			subtotal: $scope.order.subtotal
 			, shipping: $scope.order.shipping
 			, items: service_basket.all()
+			, stripe_token_id: token.id
 		};
 
 		service_orders.save(JSON.stringify(body)
 			,function(data) {
 				console.log('Orders API: ', data);
 				service_basket.reset();
+				//window.location.href = '#/home';
 			}
 			,function(err) {
 				console.log('Orders API error: ', err);
-			});*/
+				$('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").show();
+			});
 	}
 });
 
@@ -430,18 +437,23 @@ YoApp.directive('yoAccountSummary', function() {
 /* include stripe payment form */
 YoApp.directive('yoStripeForm', function() {
 	var linkFn = function(scope, el, attr) {
-		$('.stripe_form').on('submit', function(evt) {
-			console.log('submited', evt);
-		});
+		$(el).on('click', function(evt) {
+			var tokenCb = function(resp) {
+				scope.saveStripeIdToDb(resp);
+			}
 
-		el.attr({
-		    class: 'stripe-button'
-		  , 'data-key': 'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
-		  , 'data-amount': scope.order.total+'00'
-		  , 'data-name': 'YoFresh@RodonSigns'
-		  , 'data-description': ''
-		  , 'data-currency': 'usd'
-		  , 'data-image': '/img/logo.png'
+			StripeCheckout.open({
+			    key: 'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
+			  , amount: scope.order.total+'00'
+			  , name: 'YoFresh@RodonSigns'
+			  , description: ''
+			  , currency: 'usd'
+			  , panelLabel: 'Checkout'
+			  , address: false
+			  , token: tokenCb
+			});
+
+			return false;
 		});
 	}
 
