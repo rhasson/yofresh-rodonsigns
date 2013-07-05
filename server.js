@@ -70,5 +70,5 @@ server.listen(80, function() {
 	var p = proc.startWorker();
 
 	console.log('Server started');
-	console.log('Child process started with PID: ', p.pid);
+	console.log('Child process started with PIDs: ', 'mail: '+p.mail.pid, ' payment: '+p.payment.pid);
 }); //8002

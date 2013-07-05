@@ -1,8 +1,7 @@
 var db = require('../lib/db')
  	, kue = require('kue')
  	, jobs = kue.createQueue()
- 	, crypto = require('crypto')
- 	, stripe = require('stripe')(require('../config').config.stripe.test_secret);
+ 	, crypto = require('crypto');
 /*******************************************************************
 * Orders service
 * REST API for order processing
@@ -50,7 +49,6 @@ module.exports = exports = {
 	},
 	save: function(req, resp, next) {
 		var s = crypto.createHash('md5');
-		var d;
 		s.update((Math.floor((Math.random() * 999888))).toString());
 		
 		if (req.session && 'name' in req.session) {
@@ -68,43 +66,44 @@ module.exports = exports = {
 				, total: req.body.subtotal + req.body.shipping
 				, status_code: status_messages.indexOf(status_messages[0])
 				, status_message: status_messages[0]
-				, stripe_token_id: req.body.stripe_token_id
+				, stripe_token_id: req.body.stripe_token.id
+				, stripe_token: req.body.stripe_token
 				, payment_created_at: new Date().toJSON()
 				, payment_updated_at: new Date().toJSON()
 				, confirmation_number: s.digest('hex')
 			};
 
-			stripe.customers.create({
-				card: order.stripe_token_id
-				, email: req.session.email
-			}, function(err, customer) {
-				if (!err) {
-					order.stripe_customer_id = customer.id;
-					db.save('orders', req.session.user_id, order)
-					.then(function(doc) {
-						var j;
-						d = {
-							  user_id: req.session.user_id
-							, name: req.session.name.first
-							, email: req.session.email
-							, order_id: doc._id
-						};
-						
-						j = jobs.create('order confirmation', d);
-						j.on('failed', function(e) {
-							console.log('JOB FAILED: ', e);
-						});
-						j.save();
-						
-						resp.json(doc);
-					})
-					.fail(function(err) {
-						resp.json({error: {code: 0, message: 'failed to save product'}});
+			db.save('orders', req.session.user_id, order)
+			.then(function(doc) {
+				var d, j, p;
+				d = {
+					  user_id: req.session.user_id
+					, name: req.session.name.first
+					, email: req.session.email
+					, order_id: doc._id
+				};
+
+				d.stripe_token = order.stripe_token;
+
+				console.log(d)
+				p = jobs.create('create stripe customer', d);
+				p.on('failed', function(e) {
+					console.log('create stripe customer job failed: ', e);
+				});
+				p.on('complete', function() {
+					delete d.stripe_token;
+					j = jobs.create('order confirmation', d);
+					j.on('failed', function(e) {
+						console.log('order confirmation job failed: ', e);
 					});
-				} else {
-					console.log('stripe customer create: ', err);
-					resp.json({error: {code: 0, message: 'failed to create customer based on purchase id'}});
-				}
+					j.save();
+				});
+				p.attempts(3).save();
+
+				resp.json(doc);
+			})
+			.fail(function(err) {
+				resp.json({error: {code: 0, message: 'failed to save product'}});
 			});
 		} else {
 			resp.json({error: {code: 0, message: 'no valid session present'}});

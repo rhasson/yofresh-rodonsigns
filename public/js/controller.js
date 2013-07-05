@@ -237,20 +237,19 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 
 	$scope.saveStripeIdToDb = function(token) {
 		//doing checkout
-
-		console.log('ID: ',token.id)
 		var body = {
 			subtotal: $scope.order.subtotal
 			, shipping: $scope.order.shipping
 			, items: service_basket.all()
-			, stripe_token_id: token.id
+			, stripe_token: token
 		};
 
+console.log(body)
 		service_orders.save(JSON.stringify(body)
 			,function(data) {
 				console.log('Orders API: ', data);
 				service_basket.reset();
-				//window.location.href = '#/home';
+				window.location.href = '#/home';
 			}
 			,function(err) {
 				console.log('Orders API error: ', err);

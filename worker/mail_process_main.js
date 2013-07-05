@@ -12,7 +12,7 @@ var mailchimp = require('mailchimp').MandrillAPI
   	, mail = require('./mail')
     , db = require('../lib/db');
 
-jobs.process('registration confirmation', 2, function(job, done) {
+jobs.process('registration confirmation', 10, function(job, done) {
 	mail.create_registration(job.data)
 	.then(function(data) {
 		Q.ninvoke(api, 'messages_send', data)
@@ -30,7 +30,7 @@ jobs.process('registration confirmation', 2, function(job, done) {
 	});
 });
 
-jobs.process('order confirmation', 2, function(job, done) {
+jobs.process('order confirmation', 10, function(job, done) {
   db.get('orders', job.data.order_id)
   .then(function(doc) {
     doc.user = {
