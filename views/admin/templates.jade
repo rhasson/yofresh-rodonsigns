@@ -1,0 +1,60 @@
+script(type='text/ng-template', id='yo-admin-home-tpl')
+  div.span8
+
+script(type='text/ng-template', id='yo-admin-products-tpl')
+  div.span8
+    div.row-fluid
+      div.span3: a.btn.btn-primary.pull-left(href='#/products/new') Add Product
+    div.row-fluid
+      div.span8
+        table.table.table-striped
+          thead
+            tr
+              th Name
+              th Size
+              th $/unit
+          tbody
+            tr(ng-repeat='item in model.products', data-yo-admin-product-list)
+
+script(type='text/ng-template', id='yo-admin-products-items-tpl')
+  td {{item.name}}
+  td {{item.default_width}}" X {{item.default_height}}"
+  td ${{item.price}}
+
+script(type='text/ng-template', id='yo-admin-products-new-tpl')
+  div.span8
+    form.form-horizontal.products
+      div.control-group
+        label.control-label(for='product_name') Name:
+        div.controls
+          input(type='text', id='product_name', ng-model='product.name', required)
+      div.control-group
+        label.control-label(for='product_desc') Description:
+        div.controls
+          input(type='text', id='product_desc', ng-model='product.desc')
+      div.control-group
+        label.control-label(for='product_code') Code:
+        div.controls
+          input(type='text', id='product_code', ng-model='product.code', required)
+      div.control-group
+        label.control-label(for='product_size') Size:
+        div.controls
+          input(type='text', id='product_width', ng-model='product.default_width')"
+          p X 
+          input(type='text', id='product_height', ng-model='product.default_height')"
+      div.control-group
+        label.control-label(for='product_quantity') Default quantity:
+        div.controls
+          input(type='text', id='product_quantity', ng-model='product.default_quantity', required)
+      div.control-group
+        label.control-label(for='product_price') Price per unit:
+        div.controls
+          input(type='text', id='product_price', ng-model='product.price', required)
+      div.control-group
+        label.control-label(for='product_unit') Unit:
+        div.controls
+          input(type='text', id='product_unit', ng-model='product.unit', required)
+      div.control-group
+        div.controls
+          button.btn(type='submit', id='add_btn', ng-click='add()') Add
+          button.btn(type='submit', id='add_btn', ng-click='cancel()') Cancel

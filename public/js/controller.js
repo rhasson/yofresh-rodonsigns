@@ -53,7 +53,10 @@ YoApp.config(function($routeProvider, $locationProvider) {
 		.when('/final', {
 				templateUrl: 'yo-checkout-final-tpl',
 				controller: 'yoCheckoutCtrl'
-			});
+			})
+		.otherwise({
+			redirectTo: '/'
+		});
 
 	//$locationProvider.html5Mode(true);
 });
@@ -71,10 +74,6 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, ser
 		$rootScope.model.basket = service_basket.all() || [];
 		$rootScope.model.products = $rootScope.model.products || [];
 		$rootScope.model.orders = $rootScope.model.orders || [];
-
-		$('ul.nav').children().each(function(i,a){$(a).show()});
-		//$('i.icon-user').parent().append(' '+$scope.model.user.firstname);
-		//$('i.icon-basket-1').parent().append(' Basket');
 	}
 });
 

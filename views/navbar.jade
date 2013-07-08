@@ -3,12 +3,12 @@ div.navbar.navbar-fixed-top
     div.container
       a.brand(href="#") YoFresh@RodonSigns
       ul.nav.pull-right
-        li.hide.dropdown
+        li.dropdown(ng-show='model.user.firstname')
           a.dropdown-toggle(href="#", data-toggle="dropdown") {{model.user.firstname}}
             i.icon-user
           ul.dropdown-menu(data-yo-user-items)
 
-        li.hide.dropdown
+        li.dropdown(ng-show='model.basket.length>0')
           a.dropdown-toggle(href="#", data-toggle="dropdown") Purchases
             i.icon-basket-1
           ul.dropdown-menu.basket_dropdown
