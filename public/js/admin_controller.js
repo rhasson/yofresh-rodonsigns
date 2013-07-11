@@ -100,8 +100,15 @@ YoAdminApp.controller('yoAdminProductsNewCtrl', function($scope, service_product
 	}
 });
 
+/* contoller for handling interactions with order details */
 YoAdminApp.controller('yoAdminOrdersCtrl', function($scope, service_orders) {
-
+	var ps;
+	ps = service_orders.query({
+		} ,function() {
+			$scope.model.orders = ps;
+		} ,function() {
+			console.log('failed to load orders: ', ps)
+	});
 });
 
 YoAdminApp.controller('yoAdminStatsCtrl', function($scope) {
@@ -112,5 +119,66 @@ YoAdminApp.directive('yoAdminProductList', function() {
 	return {
 		restrict: 'A',
 		templateUrl: 'yo-admin-products-items-tpl'
+	}
+});
+
+/* list a summary of all orders */
+YoAdminApp.directive('yoAdminOrdersSummary', function() {
+	var linkFn = function(scope, el, attr) {
+		/*if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
+			el.removeAttr('class');
+			el.addClass('ng-scope');
+			el.addClass('warning');
+		}
+		if (scope.order.status_code >= 3 && scope.order.status_code <= 5) {
+			el.removeAttr('class');
+			el.addClass('ng-scope');
+			el.addClass('success');
+		}
+		if (scope.order.status_code >= 6 && scope.order.status_code <= 9) {
+			el.removeAttr('class');
+			el.addClass('ng-scope');
+			el.addClass('error');
+		}*/
+	};
+
+	return {
+		restrict: 'A',
+		controller: ['$scope', '$element', function($scope, $el) {
+			$scope.formatDate = function(msg) {
+				var m = moment(msg);
+				return m.fromNow();
+			}
+			$scope.orderDetail = function(id) {
+				console.log('detail: ', id)
+				var o = $scope.model.orders.filter(function(v) { return v._id === id; });
+				var div = $el.find('div.detail');
+				console.log(o, div, div.length);
+				if (div.length === 0) {
+					$el.append("<p data-yo-admin-order-details></p>");
+					$el.children('div.detail').toggle('fast');
+				}
+				else div.toggle('fast');
+			}
+		}],
+		templateUrl: 'yo-admin-orders-summary-items-tpl',
+		link: linkFn
+	}
+});
+
+/* component for showing order details */
+YoAdminApp.directive('yoAdminOrderDetails', function() {
+	return {
+		restrict: 'A',
+		replace: true,
+		templateUrl: 'yo-admin-order-details-tpl'
+	}
+});
+
+YoAdminApp.directive('yoAdminOrderDesc', function() {
+	return {
+		restrict: 'A',
+		replace: true,
+		templateUrl: 'yo-admin-order-desc-tpl'
 	}
 });

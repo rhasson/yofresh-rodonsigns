@@ -5,7 +5,7 @@
 
 var Express = require('express')
     , server = Express()
-	, RedisStore = require('connect-redis')(Express)
+    , RedisStore = require('connect-redis')(Express)
     , store = new RedisStore
     , routes = require('./routes')
     , proc = require('./worker/index.js');
@@ -65,10 +65,10 @@ server.get('/api/v0/users', routes.api.v0.users.list);
 server.get('/api/v0/users/:id', routes.api.v0.users.list);
 server.post('/api/v0/users', routes.api.v0.users.save);
 server.post('/api/v0/users/:id', routes.api.v0.users.update);
-
-server.listen(80, function() {
-	var p = proc.startWorker();
+console.log('ARGS: ', process.env);
+server.listen(8000, function() {
+	//var p = proc.startWorker();
 
 	console.log('Server started');
-	console.log('Child process started with PIDs: ', 'mail: '+p.mail.pid, ' payment: '+p.payment.pid);
+	//console.log('Child process started with PIDs: ', 'mail: '+p.mail.pid, ' payment: '+p.payment.pid);
 }); //8002

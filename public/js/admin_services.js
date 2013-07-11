@@ -13,7 +13,7 @@ angular.module('YoAdminApp.services.Products', ['ngResource']).
 ********************************************************************/
 angular.module('YoAdminApp.services.Orders', ['ngResource'])
 	.factory('service_orders', ['$rootScope', '$resource', function(root, $resource) {
-		return $resource('/api/v0/orders/:id', {id: '@id'});
+		return $resource('/api/v0/orders/:id?group=admin', {id: '@id'});
 	}]);
 
 /*******************************************************************

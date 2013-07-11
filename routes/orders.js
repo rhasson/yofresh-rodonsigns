@@ -36,13 +36,34 @@ var status_messages = [
 module.exports = exports = {
 	list: function(req, resp, next) {
 		if (req.session && 'name' in req.session) {
-			db.get('orders', req.params.id || null)
-			.then(function(doc) {
-				resp.json(doc);
-			})
-			.fail(function(err) {
-				resp.json({error: {code: 0, message: 'failed to look up product'}});
-			});
+			if ('id' in req.params) {
+				db.get('orders', req.params.id)
+				.then(function(doc) {
+					if (doc.user_id === req.session.user_id || req.session.group === 'admin') resp.json(doc);
+					else resp.json({error: {code: 0, message: 'permission denied'}});
+				})
+				.fail(function(err) {
+					resp.json({error: {code: 0, message: 'failed to look up order'}});
+				});
+			} else if ('group' in req.query) {
+				if (req.query.group === req.session.group) {
+					db.get('orders', null)
+					.then(function(doc) {
+						resp.json(doc);
+					})
+					.fail(function(err) {
+						resp.json({error: {code: 0, message: 'failed to look up orders'}});
+					});
+				}
+			} else {
+				db.get_by_userid('orders', req.session.user_id)
+				.then(function(doc) {
+					resp.json(doc);
+				})
+				.fail(function(err) {
+					resp.json({error: {code: 0, message: 'failed to look up orders'}});
+				});
+			}
 		} else {
 			resp.json({error: {code: 0, message: 'no valid session present'}});
 		}
@@ -71,6 +92,11 @@ module.exports = exports = {
 				, payment_created_at: new Date().toJSON()
 				, payment_updated_at: new Date().toJSON()
 				, confirmation_number: s.digest('hex')
+				, user: {
+					first: req.session.name.first
+				  , last: req.session.name.last
+				  , email: req.session.email
+				}
 			};
 
 			db.save('orders', req.session.user_id, order)

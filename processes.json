@@ -1,0 +1,13 @@
+[{
+  "name"      : "mail_worker",
+  "script"    : "./worker/mail_process_main.js",
+  "instances" : "1"
+},{
+    "name"      : "payment_worker",
+    "script"    : "./worker/payment_process_main.js",
+    "instances" : "1"
+},{
+    "name"      : "yofresh_server",
+    "script"    : "./server.js",
+    "instances" : "1"
+}]

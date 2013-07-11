@@ -141,6 +141,26 @@
   bottom: 270px;
 }
 
+.hardline {
+  margin: 0 !important;
+  border: 0;
+  border-top: 2px solid #000000;
+  border-bottom: 2px solid #ffffff;
+}
+
+.subdesc {
+  margin: 0 0 10px 0 !important;
+  color: #999999;
+}
+
+.titledesc {
+  border-bottom: 0 !important;
+}
+
+.hidden {
+  display: hidden;
+}
+
 /* Responsive
 -------------------------------------------------- */
 

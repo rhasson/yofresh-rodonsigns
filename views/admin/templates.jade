@@ -58,3 +58,31 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         div.controls
           button.btn(type='submit', id='add_btn', ng-click='add()') Add
           button.btn(type='submit', id='add_btn', ng-click='cancel()') Cancel
+
+script(type='text/ng-template', id='yo-admin-orders-tpl')
+  div.span8
+    div.well(ng-repeat='order in model.orders', data-yo-admin-orders-summary)
+
+script(type='text/ng-template', id='yo-admin-orders-summary-items-tpl')
+  h4.titledesc {{order.user.first}} {{order.user.last}} ({{order.user.email}})
+    h6.subdesc {{order.status_message}}
+  hr.hardline
+  h6.subdesc {{formatDate(order.created_at)}} 
+    a(ng-click='orderDetail(order._id)') {{order.confirmation_number}}
+
+script(type='text/ng-template', id='yo-admin-order-details-tpl')
+  div.detail.hidden
+    p Items purchased:
+    div.items
+      dl.dl-horizontal
+        p(ng-repeat='item in order', data-yo-admin-order-desc)
+    p Total: ${{order.total}}.00
+    p Credit card: {{order.stripe_token.card.type}} ending with {{order.stripe_token.card.last4}}
+
+script(type='text/ng-template', id='yo-admin-order-desc-tpl')
+  dt Name
+  dd {{item.name}}
+  dt Quantity
+  dd {{item.quantity}}
+  dt Total
+  dd {{item.total}}

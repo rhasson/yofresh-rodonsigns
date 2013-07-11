@@ -58,7 +58,7 @@ function Mail() {
 */
 Mail.prototype.create_registration = function(fields) {
     var body
-        , path = process.cwd() + '/worker/tpls/registration-confirmation.jade'
+        , path = process.cwd() + '/tpls/registration-confirmation.jade'
         , tpl = ''
         , self = this
         , def = Q.defer();
@@ -115,7 +115,7 @@ Mail.prototype.create_registration = function(fields) {
 Mail.prototype.create_new_order = function(fields) {
     var def = Q.defer()
         , self = this
-        , path = process.cwd() + '/worker/tpls/new-order.jade'
+        , path = process.cwd() + '/tpls/new-order.jade'
         , tpl = ''
         , body;
 
