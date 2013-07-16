@@ -442,7 +442,7 @@ YoApp.directive('yoStripeForm', function() {
 
 			StripeCheckout.open({
 			    key: 'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
-			  , amount: scope.order.total+'00'
+			  , amount: parseFloat(scope.order.total) * 100
 			  , name: 'YoFresh@RodonSigns'
 			  , description: ''
 			  , currency: 'usd'

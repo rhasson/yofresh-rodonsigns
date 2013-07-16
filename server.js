@@ -65,8 +65,13 @@ server.get('/api/v0/users', routes.api.v0.users.list);
 server.get('/api/v0/users/:id', routes.api.v0.users.list);
 server.post('/api/v0/users', routes.api.v0.users.save);
 server.post('/api/v0/users/:id', routes.api.v0.users.update);
-console.log('ARGS: ', process.env);
-server.listen(8000, function() {
+
+server.get('/api/v0/payments', routes.api.v0.payments.list);
+server.get('/api/v0/payments/:id', routes.api.v0.payments.list);
+//server.post('/api/v0/payments', routes.api.v0.users.save);
+server.post('/api/v0/payments/:id', routes.api.v0.payments.update);
+
+server.listen(7000, function() {
 	//var p = proc.startWorker();
 
 	console.log('Server started');

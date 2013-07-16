@@ -40,7 +40,7 @@ jobs.process('create stripe customer', 10, function(job, done) {
   });
 });
 
-jobs.process('process payment', 10, function(job, done) {
+jobs.process('capture charges', 10, function(job, done) {
 
 });
 

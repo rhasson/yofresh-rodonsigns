@@ -82,9 +82,9 @@ module.exports = exports = {
 			});
 			var order = {
 				  items: items
-				, subtotal: req.body.subtotal
-				, shipping: req.body.shipping
-				, total: req.body.subtotal + req.body.shipping
+				, subtotal: parseFloat(req.body.subtotal)
+				, shipping: parseFloat(req.body.shipping)
+				, total: parseFloat(req.body.subtotal) + parseFloat(req.body.shipping)
 				, status_code: status_messages.indexOf(status_messages[0])
 				, status_message: status_messages[0]
 				, stripe_token_id: req.body.stripe_token.id
