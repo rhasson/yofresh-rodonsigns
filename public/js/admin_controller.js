@@ -126,13 +126,27 @@ YoAdminApp.directive('yoAdminProductList', function() {
 /* list a summary of all orders */
 YoAdminApp.directive('yoAdminOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
-		//hide/show charge capture button
+		if (scope.order.payment.paid) {
+			scope.labelName = 'Paid';
+			scope.labelClass = 'label-success';
+		} else {
+			scope.labelName = 'Not Paid';
+			scope.labelClass = 'label-warning';
+		}
+		if (scope.order.payment.failure_code) {
+			scope.labelName = scope.order.payment.failure_message;
+			scope.labelClass = 'label-important';
+		}
 	};
 
 	return {
 		restrict: 'A',
 		controller: ['$scope', '$element', 'service_payments', 'service_orders',
 		function($scope, $el, s_pay, s_order) {
+
+			$scope.setLabelClass = function() {
+				return $scope.labelClass || 'label-info';
+			};
 			$scope.formatDate = function(msg) {
 				var m = moment(msg);
 				return m.fromNow();
@@ -157,6 +171,8 @@ YoAdminApp.directive('yoAdminOrdersSummary', function() {
 								$scope.model.orders = t;
 							},
 							function(err) {
+								$scope.labelName = 'Failed to charge card'
+								$scope.labelClass = 'label-important';
 								console.log('failed to capture charges', err)
 							});
 					}

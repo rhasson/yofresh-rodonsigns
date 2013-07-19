@@ -85,6 +85,7 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
 script(type='text/ng-template', id='yo-user-items-tpl')
   li: a(href='#/orders') Orders
   li: a(href='#/account') Account
+  li(ng-show='isAdmin()'): a(href='/admin') Admin
   li: a(href='#/logout') Logout
 
 script(type='text/ng-template', id='yo-basket-items-tpl')

@@ -60,6 +60,33 @@ jobs.process('order confirmation', 10, function(job, done) {
   })
 });
 
+jobs.process('payment confirmation', 10, function(job, done) {
+  var order_id = job.data;
+
+  db.get('orders', order_id)
+  .then(function(order) {
+    mail.create_payment_conf(order)
+    .then(function(data) {
+      Q.ninvoke(api, 'messages_send', data)
+      .then(function(resp) {
+        done();
+      })
+      .fail(function(err) {
+        console.log('failed to send message', err);
+        done(err);
+      });
+    })
+    .fail(function(err) {
+      console.log('failed to get mail template', err);
+      done(err);
+    });
+  })
+  .fail(function(err) {
+    console.log('failed to get order from db', err);
+    done(err);
+  });
+});
+
 process.on('disconnect', function() {
   console.log('Worker disconnected');
   process.exit(1)

@@ -31,10 +31,7 @@ function Mail() {
             bcc_address: "",
             tracking_domain: "yofresh.rodonsigns.com",
             signing_domain: null,
-            tags: [
-                "registration",
-                "confirmation"
-            ],
+            tags: [],
             recipient_metadata: [
                 {
                     rcpt: "",
@@ -105,6 +102,7 @@ Mail.prototype.create_registration = function(fields) {
         b.message.to[0].name = fields.name;
         b.message.recipient_metadata[0].rcpt = fields.email;
         b.message.recipient_metadata[0].values.user_id = fields.user_id;
+        b.message.tags = ["registration", "confirmation"];
 
         return (b);
     }
@@ -166,6 +164,63 @@ Mail.prototype.create_new_order = function(fields) {
         b.message.to[0].name = fields.user.name;
         b.message.recipient_metadata[0].rcpt = fields.user.email;
         b.message.recipient_metadata[0].values.user_id = fields.user_id;
+        b.message.tags = ["order", "confirmation"];
+
+        return (b);
+    }
+
+    return def.promise;
+}
+
+Mail.prototype.create_payment_conf = function(fields) {
+    var def = Q.defer()
+        , self = this
+        , path = process.cwd() + '/tpls/payment-confirmation.jade'
+        , tpl = ''
+        , body;
+
+    if (typeof self._templates['payment_conf'] !== 'function') {
+        fs.readFile(path, {encoding: 'utf8'}, function(e, t) {
+            console.log(e)
+            if (!e) {
+                self._templates['payment_conf'] = jade.compile(t);
+                body = render(self._templates['payment_conf'], self._body, fields);
+                def.resolve(body);
+            } else {
+                body = render(null, self._body, fields);
+                def.resolve(body);
+            }
+        });
+    } else {
+        body = render(self._templates['payment_conf'], self._body, fields);
+        def.resolve(body);
+    }
+
+    function render(fn, body, fields) {
+        var tpl = '';
+        var b = {};
+
+        util._extend(b, body);
+
+        if (fn && typeof fn === 'function') tpl = fn(fields);
+        else {
+            tpl = 
+                'Payment Confirmation\r\n\r\n' +
+                fields.user.first + ' thank you for placing an order with YoFresh@RodonSigns.\n' +
+                'Your ' + fields.payment.card.type + ' ending with ' + fields.payment.card.last4 + ' \n' +
+                'was charged $' + (fields.payment.amount /100).toFixed(2) +'\r\n\r\n';
+
+            tpl += 'If you have any questions don\'t hesitate to email or call us any time.\n' +
+                'Email: sales@rodonsigns.com and Phone: 215-885-5358\r\n';
+        }
+
+        (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;
+        b.message.subject = 'YoFresh@RodonSigns Payment Confirmation';
+        b.message.to[0].email = fields.user.email;
+        b.message.to[0].name = fields.user.first;
+        b.message.recipient_metadata[0].rcpt = fields.user.email;
+        b.message.recipient_metadata[0].values.user_id = fields.user_id;
+        b.message.tags = ["payment", "confirmation"];
 
         return (b);
     }

@@ -75,6 +75,11 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, ser
 		$rootScope.model.products = $rootScope.model.products || [];
 		$rootScope.model.orders = $rootScope.model.orders || [];
 	}
+
+	$rootScope.isAdmin = function() {
+		if ($rootScope.model && $rootScope.model.user && $rootScope.model.user.group === 'admin') return true;
+		else return false;
+	}
 });
 
 /* controller for handling logout */

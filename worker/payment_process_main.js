@@ -14,13 +14,12 @@ jobs.process('create stripe customer', 10, function(job, done) {
   db.get('users', job.data.user_id)
   .then(function(user) {
     if (!('stripe_customer' in user) || (user.stripe_customer.active_card.fingerprint !== job.data.stripe_token.card.fingerprint)) {
-      console.log('NO ID')
       Q.ninvoke(stripe.customers, 'create', {
         card: job.data.stripe_token.id
         , email: job.data.email
       })
       .then(function(customer) {
-        console.log('UPDATING USER', customer)
+        console.log('CREATED STRIPE CUSTOMER', customer.id);
         return db.update('users', job.data.user_id, {stripe_customer: customer})
       })
       .fail(function(e) {
@@ -28,7 +27,6 @@ jobs.process('create stripe customer', 10, function(job, done) {
         done(e);
       });
     } else {
-      console.log('ALL GOOD')
       done();
     }
   })
@@ -41,7 +39,31 @@ jobs.process('create stripe customer', 10, function(job, done) {
 });
 
 jobs.process('capture charges', 10, function(job, done) {
+  var order_id = job.data.id
+    , order = job.data.order
+    , user_id = job.data.user_id;
 
+  db.get('users', user_id)
+  .then(function(user) {
+    Q.ninvoke(stripe.charges, 'create', {
+      amount: order.total * 100
+    , currency: 'usd'
+    , customer: user.stripe_customer.id
+    , capture: true
+    })
+    .then(function(charge) {
+      console.log('PAYMENT CAPTURED: ', charge.id);
+      return db.update('orders', order_id, {payment: charge});
+    })
+    .fail(function(err) {
+      console.log('strip charge failed: ', err);
+      done(err);
+    });
+  })
+  .fail(function(err) {
+    console.log('capture charges child worker failed: ', err);
+    done(err);
+  });
 });
 
 

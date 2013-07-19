@@ -16,6 +16,7 @@ module.exports = exports = {
 					if (doc.user_id === req.session.user_id) {
 						p = jobs.create('capture charges', {
 							id: req.params.id
+						  , user_id: req.session.user_id
 						  , order: doc
 						});
 						
@@ -25,7 +26,7 @@ module.exports = exports = {
 						});
 						p.on('complete', function() {
 							resp.json({id: doc._id});
-							j = jobs.create('payment confirmation', doc);
+							j = jobs.create('payment confirmation', doc._id);
 							j.on('failed', function(e) {
 								console.log('payment confirmation job failed: ', e);
 							});

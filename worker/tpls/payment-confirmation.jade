@@ -1,0 +1,14 @@
+div
+  h2 Payment Confirmation
+  p
+    | #{user.first} thank you for placing an order with YoFresh@RodonSigns.
+    | Your #{payment.card.type} ending with #{payment.card.last4} was charged $
+    - var amount = (payment.amount /100).toFixed(2)
+    = amount
+
+  hr
+  
+  p If you have any questions don't hesitate to email or call us any time.
+  p Email: 
+    a(mailto: 'sales@rodonsigns.com') sales@rodonsigns.com
+  p Phone: 215-885-5358

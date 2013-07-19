@@ -64,6 +64,7 @@ script(type='text/ng-template', id='yo-admin-orders-tpl')
     div.well(ng-repeat='order in model.orders', data-yo-admin-orders-summary)
 
 script(type='text/ng-template', id='yo-admin-orders-summary-items-tpl')
+  span.pull-right.label(ng-class='setLabelClass()', ng-bind='labelName')
   h4.titledesc {{order.user.first}} {{order.user.last}} ({{order.user.email}})
     h6.subdesc {{order.status_message}}
   hr.hardline
@@ -75,7 +76,7 @@ script(type='text/ng-template', id='yo-admin-orders-summary-items-tpl')
       dl.dl-horizontal(ng-repeat='item in order.items', data-yo-admin-order-desc)
     p Total: ${{order.total}}.00
     p Credit card: {{order.stripe_token.card.type}} ending with {{order.stripe_token.card.last4}}
-    a.btn.btn-primary(ng-click='captureCharge(order._id)') Charge
+    a.btn.btn-primary(ng-hide='order.payment.paid', ng-click='captureCharge(order._id)') Charge
 
 script(type='text/ng-template', id='yo-admin-order-desc-tpl')
   dt Name
