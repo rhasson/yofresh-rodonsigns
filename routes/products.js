@@ -18,8 +18,9 @@ module.exports = exports = {
 		if (req.session && 'name' in req.session) {
 			if ('thumb' in req.body && 'sku' in req.body) {
 				var l = req.body.sku[0].toUpperCase();
-				req.body.thumb = process.cwd() + '/public/img/' + l + '/thumb/' + req.body.thumb;
-				req.body.thumb_large = process.cwd() + '/public/img/' + l + '/thumb_large/' + req.body.thumb;
+				var n = req.body.thumb;
+				req.body.thumb = 'img/' + l + '/thumb/' + n;
+				req.body.thumb_large = 'img/' + l + '/thumb_large/' + n;
 			}
 			db.save('products', req.session.user_id, req.body)
 			.then(function(doc) {
@@ -36,8 +37,9 @@ module.exports = exports = {
 		if (req.session && 'name' in req.session) {
 			if ('thumb' in req.body && 'sku' in req.body) {
 				var l = req.body.sku[0].toUpperCase();
-				req.body.thumb = process.cwd() + '/public/img/' + l + '/thumb/' + req.body.thumb;
-				req.body.thumb_large = process.cwd() + '/public/img/' + l + '/thumb_large/' + req.body.thumb;
+				var n = req.body.thumb;
+				req.body.thumb = 'img/' + l + '/thumb/' + n;
+				req.body.thumb_large = 'img/' + l + '/thumb_large/' + n;
 			}
 			db.update('products', req.params.id, req.body)
 			.then(function(doc) {
