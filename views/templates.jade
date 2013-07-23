@@ -69,7 +69,7 @@ script(type='text/ng-template', id='yo-home-tpl')
 
 script(type='text/ng-template', id='yo-product-detail-short-tpl')
   a.pull-left(href='#')
-    img.media-object(src='img/1.png', width='120px', heigh='120px')
+    img.media-object(ng-src='{{item.thumb}}', width='120px', heigh='120px')
   div.media-body
     h4.media-heading {{item.name}}
     p {{item.desc}}
