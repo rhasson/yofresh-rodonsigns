@@ -55,6 +55,14 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         div.controls
           input(type='text', id='product_unit', ng-model='product.unit', required)
       div.control-group
+        label.control-label(for='product_sku') SKU:
+        div.controls
+          input(type='text', id='product_sku', ng-model='product.sku', required)
+      div.control-group
+        label.control-label(for='product_thumb') Thumbnail name:
+        div.controls
+          input(type='text', id='product_thumb', ng-model='product.thumb', required)
+      div.control-group
         div.controls
           button.btn(type='submit', id='add_btn', ng-click='add()') Add
           button.btn(type='submit', id='add_btn', ng-click='cancel()') Cancel
