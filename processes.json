@@ -8,6 +8,6 @@
     "instances" : "1"
 },{
     "name"      : "yofresh_server",
-    "script"    : "./server.js",
+    "script"    : "./yofresh_server.js",
     "instances" : "1"
 }]
