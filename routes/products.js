@@ -1,5 +1,4 @@
 var db = require('../lib/db');
-
 module.exports = exports = {
 	list: function(req, resp, next) {
 		if (req.session && 'name' in req.session) {
