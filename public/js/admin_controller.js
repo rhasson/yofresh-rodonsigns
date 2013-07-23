@@ -83,12 +83,13 @@ YoAdminApp.controller('yoAdminProductsNewCtrl', function($scope, service_product
 		service_products.save({
 			name: $scope.product.name,
 			desc: $scope.product.desc,
-			code: $scope.product.code,
 			default_width: $scope.product.default_width,
 			default_height: $scope.product.default_height,
 			default_quantity: $scope.product.default_quantity,
 			price: $scope.product.price,
-			unit: $scope.product.unit
+			unit: $scope.product.unit,
+			sku: $scope.product.sku,
+			thumb: $scope.product.thumb,
 		}, function(data) {
 			console.log('RESP: ', data)
 			$scope.product = {};
