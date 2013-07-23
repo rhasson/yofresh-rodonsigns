@@ -48,7 +48,7 @@ module.exports = exports = {
 					});
 					p.on('failed', function(e) {
 						console.log('capture payment job failed: ', e);
-					};
+					});
 					p.on('complete', function() {
 						console.log('sent registration confirmation');
 					});
