@@ -22,7 +22,7 @@ module.exports = exports = {
 				resp.json(auth);
 			})
 			.fail(function(err) {
-				resp.json({error: {code: 2, message: err.message || 'login failed'}});
+				resp.json({error: {code: 2, message: 'login failed'}});
 			});
 		},
 		logout: function(req, resp, next) {
@@ -40,12 +40,19 @@ module.exports = exports = {
 					group: 'nobody'
 				})
 				.then(function(doc) {
-
-					jobs.add('registration confirmation', {
+					var p;
+					p = jobs.create('registration confirmation', {
 						user_id: doc._id,
 						name: req.body.firstname,
-						email: req.body.email})
-					.save();
+						email: req.body.email
+					});
+					p.on('failed', function(e) {
+						console.log('capture payment job failed: ', e);
+					};
+					p.on('complete', function() {
+						console.log('sent registration confirmation');
+					});
+					p.save();
 					
 					db.auth(req.body.email, req.body.password)
 					.then(function(auth) {
