@@ -65,11 +65,11 @@ module.exports = exports = {
 					})
 					.fail(function(err) {
 						console.log(err)
-						resp.json({error: {code: 2, 'login failed'}});
+						resp.json({error: {code: 2, message: 'login failed'}});
 					});
 				})
 				.fail(function(err) {
-					resp.json({error: {code: 1, 'registration failed'}});
+					resp.json({error: {code: 1, message: 'registration failed'}});
 				});
 			}
 		},
