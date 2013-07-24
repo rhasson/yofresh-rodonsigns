@@ -161,6 +161,9 @@
   display: none;
 }
 
+.thumb {
+  padding-right: 1em;
+}
 /* Responsive
 -------------------------------------------------- */
 
