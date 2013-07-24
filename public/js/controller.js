@@ -70,17 +70,30 @@ YoApp.config(function($routeProvider, $locationProvider) {
 * All UI element controllers
 ********************************************************************/
 /* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, service_session, service_basket) {
+YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, service_session, service_basket, service_products) {
 	if (!service_session.isLoggedin()) window.location.href = '#/login';
 	else {
 		$rootScope.model = $rootScope.model || {};
 		$rootScope.model.user = $rootScope.model.user || service_session.get();
 		$rootScope.model.basket = service_basket.all() || [];
-		$rootScope.model.products = $rootScope.model.products || [];
+		$rootScope.model.products = $rootScope.model.products || getProducts();
 		$rootScope.model.orders = $rootScope.model.orders || [];
 	}
 
-console.log($routeParams)
+	function getProducts() {
+		console.log('CALLING getProducts')
+		var ps;
+		if (service_session.isLoggedin()) {
+			ps = service_products.query({
+				} ,function(p) {
+					$('div.loading').remove();
+					$rootScope.model.products = p;
+					$rootScope.model.page = p;
+				} ,function() {
+					$('div.loading').html('Failed to retrieve product');
+			});
+		}
+	}
 	if (!('page' in $routeParams)) $rootScope.model.page = $rootScope.model.products;
 	else {
 		$rootScope.model.page = $rootScope.model.products.filter(function(v) {
@@ -94,6 +107,7 @@ console.log($routeParams)
 	}
 
 	$rootScope.makeActive = function(group) {
+		$('div.loading').remove();
 		if ('page' in $routeParams) {
 			if (group === $routeParams.page) return 'active';
 			return '';
@@ -188,7 +202,7 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 
 /* product list controller to retreive all products from db */
 YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, service_products) {
-	var ps;
+/*	var ps;
 	if (service_session.isLoggedin()) {
 		ps = service_products.query({
 			} ,function() {
@@ -197,7 +211,7 @@ YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, 
 			} ,function() {
 				$('div.loading').html('Failed to retrieve product');
 		});
-	}
+	}*/
 });
 
 /* contoller for handling interactions with product details */
