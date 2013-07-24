@@ -35,13 +35,14 @@ module.exports = exports = {
 	},
 	update: function(req, resp, next) {
 		if (req.session && 'name' in req.session) {
-			if ('thumb' in req.body && 'sku' in req.body) {
-				var l = req.body.sku[0].toUpperCase();
-				var n = req.body.thumb;
-				req.body.thumb = 'img/' + l + '/thumb/' + n;
-				req.body.thumb_large = 'img/' + l + '/thumb_large/' + n;
+			var body = req.body.body;
+			if ('thumb' in body && 'sku' in body) {
+				var l = body.sku[0].toUpperCase();
+				var n = body.thumb;
+				body.thumb = 'img/' + l + '/thumb/' + n;
+				body.thumb_large = 'img/' + l + '/thumb_large/' + n;
 			}
-			db.update('products', req.params.id, req.body)
+			db.update('products', req.params.id, body)
 			.then(function(doc) {
 				resp.json(doc);
 			})

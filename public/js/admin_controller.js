@@ -33,20 +33,21 @@ YoAdminApp.config(function($routeProvider, $locationProvider) {
 				templateUrl: 'yo-admin-products-new-tpl',
 				controller: 'yoAdminProductsNewCtrl'
 			})
+		.when('/products/edit/:id', {
+				templateUrl: 'yo-admin-products-new-tpl',
+				controller: 'yoAdminProductsEditCtrl'
+			})
 		.when('/orders', {
 				templateUrl: 'yo-admin-orders-tpl',
 				controller: 'yoAdminOrdersCtrl'
-			})
-		.when('/stats', {
-				templateUrl: 'yo-admin-stats-tpl',
-				controller: 'yoAdminStatsCtrl'
 			});
 });
 
 YoAdminApp.controller('yoAdminMainCtrl', function($scope, $rootScope) {
 	$rootScope.model = {};
-	$rootScope.model.products = {};
-	$rootScope.model.orders = {};
+	$rootScope.model.products = [];
+	$rootScope.model.orders = [];
+	$rootScope.model.stats = [];
 
 	$('.nav-tabs').on('click', function(evt) {
 		var nav = $(this).children();
@@ -62,19 +63,25 @@ YoAdminApp.controller('yoAdminMainCtrl', function($scope, $rootScope) {
 
 YoAdminApp.controller('yoAdminProductsCtrl', function($scope, service_products) {
 	var ps;
+	console.log(service_products())
 	ps = service_products.query({
-		} ,function() {
-			$scope.model.products = ps;
+		} ,function(p) {
+			p.forEach(function(v) {
+				var x = v.thumb.split('/');
+				v.thumb = x[x.length-1];
+			});
+			$scope.model.products = p;
 		} ,function() {
 			console.log('failed to load products');
-	});
+		});
 
 	$scope.remove = function(id) {
-
-	}
-
-	$scope.update = function(id) {
-
+		var self = this;
+		$scope.model.products = $scope.model.products.filter(function(v) {
+			return self.item._id !== v._id;
+		});
+		service_products.remove({id: self.item._id});
+		delete self.item;
 	}
 });
 
@@ -102,6 +109,40 @@ YoAdminApp.controller('yoAdminProductsNewCtrl', function($scope, service_product
 	}
 });
 
+YoAdminApp.controller('yoAdminProductsEditCtrl', function($scope, $routeParams, service_products) {
+	if ('id' in $routeParams) {
+		var x = $scope.model.products.filter(function(v) {
+			return $routeParams.id === v._id
+		});
+		$scope.product = x[0];
+	}
+
+	$scope.add = function() {
+		var body = {
+			name: $scope.product.name,
+			desc: $scope.product.desc,
+			default_width: $scope.product.default_width,
+			default_height: $scope.product.default_height,
+			default_quantity: $scope.product.default_quantity,
+			price: $scope.product.price,
+			unit: $scope.product.unit,
+			sku: $scope.product.sku,
+			thumb: $scope.product.thumb,
+		};
+
+		service_products.save({id: $scope.product._id, body: body}, function(data) {
+			console.log('RESP: ', data)
+			$scope.product = {};
+			window.location.href = '#/products';
+		});
+	};
+
+	$scope.cancel = function() {
+		$scope.product = {};
+		window.location.href = '#/products';
+	}
+});
+
 /* contoller for handling interactions with order details */
 YoAdminApp.controller('yoAdminOrdersCtrl', function($scope, service_orders) {
 	var ps;
@@ -113,9 +154,6 @@ YoAdminApp.controller('yoAdminOrdersCtrl', function($scope, service_orders) {
 	});
 });
 
-YoAdminApp.controller('yoAdminStatsCtrl', function($scope) {
-
-});
 
 YoAdminApp.directive('yoAdminProductList', function() {
 	return {
