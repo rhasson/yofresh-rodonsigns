@@ -56,31 +56,38 @@ script(type='text/ng-template', id='yo-logout-tpl')
   div Thank You!
 
 script(type='text/ng-template', id='yo-home-tpl')
-  div.span3
+  div.bs-docs-sidebar.span3
     ul.nav.nav-list.bs-docs-sidenav.affix
-      li: a(href='#/') Decals
+      li(ng-class='makeActive("D")'): a(href='#/home/D') Digital Prints
         i.icon-chevron-right
-      li: a(href='#/') Windows
+      li(ng-class='makeActive("W")'): a(href='#/home/W') Wall Art
         i.icon-chevron-right
-  div.span9(ng-controller='yoProductCtrl')
+      li(ng-class='makeActive("V")'): a(href='#/home/V') Cut Vinyl
+        i.icon-chevron-right
+      li(ng-class='makeActive("F")'): a(href='#/home/F') Flavors
+        i.icon-chevron-right
+      li(ng-class='makeActive("M")'): a(href='#/home/M') Additional Items
+        i.icon-chevron-right
+  div.span9(ng-controller='yoProductCtrl', data-spy='scroll', data-target='.bs-docs-sidenav')
     div.loading Loading...
-    ul.media-list
-      li.media(ng-repeat='item in model.products', data-yo-product-detail-short)
+    div.media(ng-repeat='item in model.page', data-yo-product-detail-short)
 
 script(type='text/ng-template', id='yo-product-detail-short-tpl')
-  a.pull-left(href='#')
-    img.media-object(ng-src='{{item.thumb}}', width='120px', heigh='120px')
-  div.media-body
-    h4.media-heading {{item.name}}
-    p {{item.desc}}
-    p Size: {{item.default_width}}" X {{item.default_height}}"
-    p Quantity: 
-      input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
-    p Price: ${{item.price}}
-    p 
-      a.add-btn.btn.btn-primary(ng-click='add()') Add
-      a.remove-btn.btn.hide(ng-click='remove()') Remove
-  hr
+  section
+    a.pull-left(href='#')
+      img.media-object(ng-src='{{item.thumb}}', width='120px', heigh='120px')
+    div.media-body
+      h4.media-heading {{item.name}}
+      p {{item.desc}}
+      p Size: {{item.default_width}}" X {{item.default_height}}"
+      p Quantity: 
+        input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
+        span(ng-show='item.unit > 1') each is a set of {{item.unit}}
+      p Price: ${{item.price}}
+      p 
+        a.add-btn.btn.btn-primary(ng-click='add()') Add
+        a.remove-btn.btn.hide(ng-click='remove()') Remove
+    hr
 
 script(type='text/ng-template', id='yo-user-items-tpl')
   li: a(href='#/orders') Orders
