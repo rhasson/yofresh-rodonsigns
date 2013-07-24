@@ -59,7 +59,7 @@
 .message { text-align: center; }
 .quantity {
   width: 30px;
-  margin-left: 10px;
+  margin: 0 5px 0 10px;
 }
 .ellipsis {
     width: 100%;

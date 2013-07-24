@@ -38,6 +38,10 @@ YoApp.config(function($routeProvider, $locationProvider) {
 				templateUrl: 'yo-home-tpl',
 				controller: 'yoMainCtrl'
 			})
+		.when('/home/:page', {
+				templateUrl: 'yo-home-tpl',
+				controller: 'yoMainCtrl'
+			})
 		.when('/checkout', {
 				templateUrl: 'yo-checkout-tpl',
 				controller: 'yoCheckoutCtrl'
@@ -66,7 +70,7 @@ YoApp.config(function($routeProvider, $locationProvider) {
 * All UI element controllers
 ********************************************************************/
 /* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, service_basket) {
+YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, service_session, service_basket) {
 	if (!service_session.isLoggedin()) window.location.href = '#/login';
 	else {
 		$rootScope.model = $rootScope.model || {};
@@ -76,9 +80,24 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, service_session, ser
 		$rootScope.model.orders = $rootScope.model.orders || [];
 	}
 
+console.log($routeParams)
+	if (!('page' in $routeParams)) $rootScope.model.page = $rootScope.model.products;
+	else {
+		$rootScope.model.page = $rootScope.model.products.filter(function(v) {
+			return v.sku[0] === $routeParams.page;
+		});
+	}
+
 	$rootScope.isAdmin = function() {
 		if ($rootScope.model && $rootScope.model.user && $rootScope.model.user.group === 'admin') return true;
 		else return false;
+	}
+
+	$rootScope.makeActive = function(group) {
+		if ('page' in $routeParams) {
+			if (group === $routeParams.page) return 'active';
+			return '';
+		} else return '';
 	}
 });
 
@@ -151,9 +170,13 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 						  .html('Email is already in use!')
 						  .fadeIn();
 					} else {
-						service_session.set(body);
-						window.location.href = '#/home';
+						$('.message')
+						  .html('Failed to register, please try again later.')
+						  .fadeIn();
 					}
+				} else {
+					service_session.set(body);
+					window.location.href = '#/home';
 				}
 			})
 			.fail(function(err) {
@@ -217,7 +240,6 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 	var items = service_basket.all();
 
 	items.forEach(function(v) {
-		console.log(v)
 		$scope.order.subtotal += v.total;
 	});
 
@@ -228,7 +250,6 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 		ps = service_accounts.get({id: $scope.model.user._id
 			} ,function() {
 				$scope.model.account = ps;
-				console.log('account: ', ps)
 			} ,function() {
 				console.log('failed to load account: ', ps)
 		});
@@ -248,10 +269,8 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 			, stripe_token: token
 		};
 
-console.log(body)
 		service_orders.save(JSON.stringify(body)
 			,function(data) {
-				console.log('Orders API: ', data);
 				service_basket.reset();
 				window.location.href = '#/home';
 			}
@@ -269,7 +288,6 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_sessio
 		ps = service_orders.query({
 			} ,function() {
 				$scope.model.orders = ps;
-				console.log('ps: ', ps)
 			} ,function() {
 				console.log('failed to load orders: ', ps)
 		});
@@ -283,7 +301,6 @@ YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_se
 		ps = service_accounts.get({id: $scope.model.user._id
 			} ,function() {
 				$scope.model.account = ps;
-				console.log('account: ', ps)
 			} ,function() {
 				console.log('failed to load account: ', ps)
 		});
@@ -317,23 +334,8 @@ YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_se
 ********************************************************************/
 /* create product detail ui elements */
 YoApp.directive('yoProductDetail', function() {
-	var linkFn = function(scope, element, attrs) {
-		var b = scope.get(scope.item._id);
-		scope.new_quantity = parseFloat(scope.new_quantity) || parseFloat(scope.item.default_quantity);
-		if (b) scope.new_quantity = b.quantity;
-
-		scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
-
-		$(element).find('.quantity').change(function() {
-			scope.new_quantity = parseFloat($(this).val());
-			scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
-			scope.$apply();
-		});
-	}
-
 	return {
 		restrict: 'A',
-		link: linkFn,
 		templateUrl: 'yo-product-detail-tpl',
 		controller: 'yoProductDetailCtrl'
 	}

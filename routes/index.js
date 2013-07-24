@@ -61,15 +61,15 @@ module.exports = exports = {
 						req.session.email = auth.email;
 						req.session.group = auth.group;
 
-						resp.json({status: 'ok'});
+						resp.json(auth);
 					})
 					.fail(function(err) {
 						console.log(err)
-						resp.json({error: {code: 2, message: err.message || 'login failed'}});
+						resp.json({error: {code: 2, 'login failed'}});
 					});
 				})
 				.fail(function(err) {
-					resp.json({error: {code: 1, message: err.message || 'registration failed'}});
+					resp.json({error: {code: 1, 'registration failed'}});
 				});
 			}
 		},
