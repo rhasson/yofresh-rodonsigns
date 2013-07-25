@@ -17,15 +17,6 @@ angular.module('YoAdminApp.services.Orders', ['ngResource'])
 	}]);
 
 /*******************************************************************
-* Stats service
-* Returns ngResource to interface with stats API
-********************************************************************/
-angular.module('YoAdminApp.services.Stats', ['ngResource'])
-	.factory('service_stats', ['$rootScope', '$resource', function(root, $resource) {
-		return $resource('/api/v0/stats/:id', {id: '@id'});
-	}]);
-
-/*******************************************************************
 * Payment service
 * Returns ngResource to interface with payment API
 ********************************************************************/
@@ -33,3 +24,12 @@ angular.module('YoAdminApp.services.Payments', ['ngResource'])
 	.factory('service_payments', ['$rootScope', '$resource', function(root, $resource) {
 		return $resource('/api/v0/payments/:id', {id: '@id'});
 	}]);
+
+/*******************************************************************
+* Stats service
+* Returns ngResource to interface with stats API
+********************************************************************/
+angular.module('YoAdminApp.services.Stats', ['ngResource'])
+	.factory('service_stats', ['$rootScope', '$resource', function(root, $resource) {
+		return $resource('/api/v0/stats/:id', {id: '@id'});
+	}]);	

@@ -137,7 +137,7 @@ YoApp.controller('yoLoginCtrl', function($scope, service_session) {
 			$('.message')
 			  .fadeOut();
 			$.post('/login', {
-					email: $('#iEmail').val(),
+					email: $('#iEmail').val().toLowerCase(),
 					password: CryptoJS.MD5($('#iPassword').val()).toString()
 				}
 			)
@@ -171,7 +171,7 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 			$('.message')
 			  .fadeOut();
 			$.post('/register', {
-					email: $('#iEmail').val(),
+					email: $('#iEmail').val().toLowerCase(),
 					firstname: $('#iFirstname').val(),
 					lastname: $('#iLastname').val(),
 					password: CryptoJS.MD5($('#iPassword').val()).toString()
@@ -367,7 +367,7 @@ YoApp.directive('yoProductDetailShort', function() {
 		$(element).find('.quantity').change(function() {
 			scope.new_quantity = parseFloat($(this).val());
 			scope.total = parseFloat(scope.item.price) * parseFloat(scope.new_quantity);
-			scope.$apply();
+			//scope.$apply();
 		});
 	}
 
