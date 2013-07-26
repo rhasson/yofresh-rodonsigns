@@ -87,6 +87,7 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
         span(ng-show='item.unit > 1') each is a set of {{item.unit}}
       p(ng-show='item.sizes.length > 1') Price: ${{ssize.price}}
       p(ng-show='item.sizes.length == 1') Price: ${{item.sizes[0].price}}
+      p(ng-show='item.sizes.length <= 0') Price: ${{item.price}}
       p 
         a.add-btn.btn.btn-primary(ng-click='add()') Add
         a.remove-btn.btn.hide(ng-click='remove()') Remove
