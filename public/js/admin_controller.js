@@ -43,7 +43,8 @@ YoAdminApp.config(function($routeProvider, $locationProvider) {
 			});
 });
 
-YoAdminApp.controller('yoAdminMainCtrl', function($scope, $rootScope) {
+YoAdminApp.controller('yoAdminMainCtrl', function($scope, $rootScope, service_stats) {
+	var st;
 	$rootScope.model = {};
 	$rootScope.model.products = [];
 	$rootScope.model.orders = [];
@@ -58,24 +59,35 @@ YoAdminApp.controller('yoAdminMainCtrl', function($scope, $rootScope) {
 			});
 			$(p).addClass('active');
 		}
-	})
+	});
+
+/*	st = service_stats.query({},
+		function(s) {
+			$rootScope.model.stats = s;
+		},
+		function(err) {
+			console.log('failed to load stats');
+		});
+*/
 });
 
 YoAdminApp.controller('yoAdminProductsCtrl', function($scope, service_products) {
 	var ps;
-	console.log(service_products())
 	ps = service_products.query({
 		} ,function(p) {
 			p.forEach(function(v) {
-				var x = v.thumb.split('/');
-				v.thumb = x[x.length-1];
+				var x;
+				if (v.thumb.length) {
+					x = v.thumb.split('/');
+					v.thumb = x[x.length-1];
+				}
 			});
 			$scope.model.products = p;
 		} ,function() {
 			console.log('failed to load products');
 		});
 
-	$scope.remove = function(id) {
+	$scope.remove = function() {
 		var self = this;
 		$scope.model.products = $scope.model.products.filter(function(v) {
 			return self.item._id !== v._id;
@@ -86,25 +98,30 @@ YoAdminApp.controller('yoAdminProductsCtrl', function($scope, service_products) 
 });
 
 YoAdminApp.controller('yoAdminProductsNewCtrl', function($scope, service_products) {
+	$scope.sizes = [];
+
 	$scope.add = function() {
 		service_products.save({
 			name: $scope.product.name,
 			desc: $scope.product.desc,
-			default_width: $scope.product.default_width,
-			default_height: $scope.product.default_height,
+			sizes: $scope.sizes,
+			//default_width: $scope.product.default_width,
+			//default_height: $scope.product.default_height,
 			default_quantity: $scope.product.default_quantity,
-			price: $scope.product.price,
+			//price: $scope.product.price,
 			unit: $scope.product.unit,
 			sku: $scope.product.sku,
 			thumb: $scope.product.thumb,
 		}, function(data) {
 			console.log('RESP: ', data)
 			$scope.product = {};
+			$scope.sizes = [];
 		});
 	};
 
 	$scope.cancel = function() {
 		$scope.product = {};
+		$scope.sizes = [];
 		window.location.href = '#/products';
 	}
 });
@@ -115,16 +132,18 @@ YoAdminApp.controller('yoAdminProductsEditCtrl', function($scope, $routeParams, 
 			return $routeParams.id === v._id
 		});
 		$scope.product = x[0];
+		$scope.sizes = $scope.product.sizes;
 	}
 
 	$scope.add = function() {
 		var body = {
 			name: $scope.product.name,
 			desc: $scope.product.desc,
-			default_width: $scope.product.default_width,
-			default_height: $scope.product.default_height,
+			sizes: $scope.sizes,
+//			default_width: $scope.product.default_width,
+//			default_height: $scope.product.default_height,
 			default_quantity: $scope.product.default_quantity,
-			price: $scope.product.price,
+//			price: $scope.product.price,
 			unit: $scope.product.unit,
 			sku: $scope.product.sku,
 			thumb: $scope.product.thumb,
@@ -133,12 +152,14 @@ YoAdminApp.controller('yoAdminProductsEditCtrl', function($scope, $routeParams, 
 		service_products.save({id: $scope.product._id, body: body}, function(data) {
 			console.log('RESP: ', data)
 			$scope.product = {};
+			$scope.sizes = [];
 			window.location.href = '#/products';
 		});
 	};
 
 	$scope.cancel = function() {
 		$scope.product = {};
+		$scope.sizes = [];
 		window.location.href = '#/products';
 	}
 });
@@ -165,16 +186,21 @@ YoAdminApp.directive('yoAdminProductList', function() {
 /* list a summary of all orders */
 YoAdminApp.directive('yoAdminOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
-		if (scope.order.payment.paid) {
-			scope.labelName = 'Paid';
-			scope.labelClass = 'label-success';
+		if ('payment' in scope.order) {
+			if (scope.order.payment.paid) {
+				scope.labelName = 'Paid';
+				scope.labelClass = 'label-success';
+			} else {
+				scope.labelName = 'Not Paid';
+				scope.labelClass = 'label-warning';
+			}
+			if (scope.order.payment.failure_code) {
+				scope.labelName = scope.order.payment.failure_message;
+				scope.labelClass = 'label-important';
+			}
 		} else {
 			scope.labelName = 'Not Paid';
 			scope.labelClass = 'label-warning';
-		}
-		if (scope.order.payment.failure_code) {
-			scope.labelName = scope.order.payment.failure_message;
-			scope.labelClass = 'label-important';
 		}
 	};
 

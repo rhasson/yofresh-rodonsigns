@@ -18,10 +18,10 @@ script(type='text/ng-template', id='yo-admin-products-tpl')
 
 script(type='text/ng-template', id='yo-admin-products-items-tpl')
   td {{item.name}}
-  td {{item.default_width}}" X {{item.default_height}}"
-  td ${{item.price}}
+  td {{item.sizes[0].w}}" x {{item.sizes[0].h}}"
+  td ${{item.sizes[0].price}}
   td: a(href='#/products/edit/{{item._id}}') Edit
-  td: a(ng-click='remove()') Remove
+  td: a(href ng-click='remove()') Remove
 
 script(type='text/ng-template', id='yo-admin-products-new-tpl')
   div.span8
@@ -35,19 +35,21 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         div.controls
           input(type='text', id='product_desc', ng-model='product.desc')
       div.control-group
-        label.control-label(for='product_size') Size:
+        label.control-label(for='product_size') Sizes:
         div.controls
-          input(type='text', id='product_width', ng-model='product.default_width')"
-          p X 
-          input(type='text', id='product_height', ng-model='product.default_height')"
+          ul
+            li(ng-repeat='s in sizes')
+              input.sizes(type='number', min='1', inputmode='numeric', id='w', ng-model='s.w')
+              span x
+              input.sizes(type='number', min='1', inputmode='numeric', id='h', ng-model='s.h')
+              span Price: 
+              input.sizes(type='number', min='1', inputmode='numeric', id='price', ng-model='s.price')
+              a(href ng-click='sizes.splice($index, 1)') [X]
+            li: a(href ng-click='sizes.push({})') [Add]
       div.control-group
         label.control-label(for='product_quantity') Default quantity:
         div.controls
           input(type='text', id='product_quantity', ng-model='product.default_quantity', required)
-      div.control-group
-        label.control-label(for='product_price') Price per unit:
-        div.controls
-          input(type='text', id='product_price', ng-model='product.price', required)
       div.control-group
         label.control-label(for='product_unit') Unit:
         div.controls
