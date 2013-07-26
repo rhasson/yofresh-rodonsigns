@@ -18,8 +18,9 @@ script(type='text/ng-template', id='yo-admin-products-tpl')
 
 script(type='text/ng-template', id='yo-admin-products-items-tpl')
   td {{item.name}}
-  td {{item.sizes[0].w}}" x {{item.sizes[0].h}}"
-  td ${{item.sizes[0].price}}
+  td: span(ng-show='item.sizes.length >= 1'){{item.sizes[0].w}}" x {{item.sizes[0].h}}"
+  td(ng-show='item.sizes.length >= 1') ${{item.sizes[0].price}}
+  td(ng-show='item.sizes.length == 0 && item.price') ${{item.price}}
   td: a(href='#/products/edit/{{item._id}}') Edit
   td: a(href ng-click='remove()') Remove
 
@@ -54,6 +55,11 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         label.control-label(for='product_unit') Unit:
         div.controls
           input(type='text', id='product_unit', ng-model='product.unit', required)
+      div.control-group
+        label.control-label(for='product_price') Price:
+        div.controls
+          input(type='number', id='product_price', ng-model='product.price')
+          h6 This field is only used if the product is not a sign and doesn't have dimensions
       div.control-group
         label.control-label(for='product_sku') SKU:
         div.controls
