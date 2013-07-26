@@ -152,6 +152,7 @@ Mail.prototype.create_new_order = function(fields) {
             });
 
             tpl += '\r\n\r\n' +
+                    'shipping: $' + field.shipping + '\n' +
                     'total payment: $' + fields.total;
             tpl += '\r\n\r\n' +
                 'If you have any questions don\'t hesitate to email or call us any time.\n' +

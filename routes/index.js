@@ -32,19 +32,26 @@ module.exports = exports = {
 		register: function(req, resp, next) {
 			if (req.session) {
 				console.log('BODY: ', req.body);
+				var b = {
+					firstname: Capitalize(req.body.firstname),
+					lastname: Capitalize(req.body.lastname),
+					email: req.body.email.toLowerCase(),
+					password: req.body.password
+				};
+
 				db.save('users', '', {
-					firstname: req.body.firstname,
-					lastname: req.body.lastname,
-					email: req.body.email,
-					password: req.body.password,
+					firstname: b.firstname,
+					lastname: b.lastname,
+					email: b.email,
+					password: b.password,
 					group: 'nobody'
 				})
 				.then(function(doc) {
 					var p;
 					p = jobs.create('registration confirmation', {
 						user_id: doc._id,
-						name: req.body.firstname,
-						email: req.body.email
+						name: b.firstname,
+						email: b.email
 					});
 					p.on('failed', function(e) {
 						console.log('capture payment job failed: ', e);
@@ -54,7 +61,7 @@ module.exports = exports = {
 					});
 					p.save();
 					
-					db.auth(req.body.email, req.body.password)
+					db.auth(b.email, b.password)
 					.then(function(auth) {
 						req.session.user_id = auth._id;
 						req.session.name = {first: auth.firstname, last: auth.lastname};
@@ -97,4 +104,9 @@ module.exports = exports = {
 			payments: Payments
 		}
 	}
+}
+
+
+function Capitalize(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
