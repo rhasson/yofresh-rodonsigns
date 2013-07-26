@@ -136,7 +136,7 @@ script(type='text/ng-template', id='yo-checkout-tpl')
 
 script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.name}}
-  td {{item.default_width}}" X {{item.default_height}}"
+  td: span(ng-show='item.default_width > 0') {{item.default_width}}" X {{item.default_height}}"
   td {{item.quantity}}
   td ${{item.price}}
   td ${{item.total}}

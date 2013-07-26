@@ -220,10 +220,10 @@ YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 		var x = $scope.item;
 
 		x.quantity = parseFloat($scope.new_quantity);
-		x.total = parseFloat($scope.total);
+		x.price = $scope.ssize ? $scope.ssize.price : parseFloat(x.price);
+		x.total = x.quantity * x.price;
 		x.default_width = $scope.ssize ? $scope.ssize.w : 0;
 		x.default_height = $scope.ssize ? $scope.ssize.h : 0;
-		x.price = $scope.ssize ? $scope.ssize.price : x.price;
 		service_basket.set(x);
 		$scope.model.basket = service_basket.all();
 	}
@@ -365,16 +365,17 @@ YoApp.directive('yoProductDetailShort', function() {
 		var b = scope.get(scope.item._id);
 		var price;
 		scope.ssize = scope.item.sizes[0];
-		price = scope.ssize ? scope.ssize.price : scope.item.price;
+		price = scope.ssize ? scope.ssize.price : parseFloat(scope.item.price);
 
-		scope.new_quantity = parseFloat(scope.new_quantity) || parseFloat(scope.item.default_quantity);
+		scope.new_quantity = scope.new_quantity || parseFloat(scope.item.default_quantity);
 		if (b) scope.new_quantity = b.quantity;
 
-		scope.total = parseFloat(price) * parseFloat(scope.new_quantity);
+		//scope.total = price * scope.new_quantity;
+		//console.log('MAKING TOTAL: ', scope.total)
 
 		$(element).find('.quantity').change(function() {
 			scope.new_quantity = parseFloat($(this).val());
-			scope.total = parseFloat(price) * parseFloat(scope.new_quantity);
+		//	scope.total = price * scope.new_quantity;
 			//scope.$apply();
 		});
 	}
