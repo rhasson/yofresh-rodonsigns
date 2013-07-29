@@ -97,7 +97,7 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, servic
 	if (!('page' in $routeParams)) $rootScope.model.page = $rootScope.model.products;
 	else {
 		$rootScope.model.page = $rootScope.model.products.filter(function(v) {
-			return v.sku[0] === $routeParams.page;
+			return v.sku ? v.sku[0] === $routeParams.page : false;
 		});
 	}
 
