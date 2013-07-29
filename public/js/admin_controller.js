@@ -77,7 +77,7 @@ YoAdminApp.controller('yoAdminProductsCtrl', function($scope, service_products) 
 		} ,function(p) {
 			p.forEach(function(v) {
 				var x;
-				if (v.thumb.length) {
+				if (v.thumb && v.thumb.length) {
 					x = v.thumb.split('/');
 					v.thumb = x[x.length-1];
 				}
