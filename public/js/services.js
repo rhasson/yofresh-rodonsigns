@@ -99,17 +99,21 @@ angular.module('YoApp.services.Basket', [])
 	.factory('service_basket', ['$rootScope', function(root) {
 		function Basket() {
 			this._basket = [];
+			this._subtotal = 0;
+			this._tax = 0;
 		}
 
 		Basket.prototype.set = function(item) {
 			var i; 
 			if (i = this._basket[item._id]) {
 				i.quantity += item.quantity;
+				this._subtotal -= i.total;
 				i.total = i.quantity * parseFloat(i.price);
 			} else {
 				i = item;
 			}
 			this._basket[i._id] = i;
+			this._subtotal += i.total;
 			return this;
 		}
 
@@ -127,13 +131,30 @@ angular.module('YoApp.services.Basket', [])
 			return b;
 		}
 
-		Basket.prototype.remove = function(id) {
+		Basket.prototype.remove = function(id) {			
+			this._subtotal -= this._basket[id].total
 			return delete this._basket[id];
 		}
 
 		Basket.prototype.reset = function() {
 			this._basket = [];
+			this._subtotal = 0;
+			this._tax = 0;
 			return this;
+		}
+
+		Basket.prototype.tax = function() {
+			if (root.model.user)
+			this._tax = 0;
+			return this._tax;
+		}
+
+		Basket.prototype.total = function() {
+
+		}
+
+		Basket.prototype.subtotal = function() {
+
 		}
 
 		return new Basket();

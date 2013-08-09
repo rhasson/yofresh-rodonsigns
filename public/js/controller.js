@@ -46,6 +46,14 @@ YoApp.config(function($routeProvider, $locationProvider) {
 				templateUrl: 'yo-checkout-tpl',
 				controller: 'yoCheckoutCtrl'
 			})
+		.when('/address', {
+				templateUrl: 'yo-address-confirmation-tpl',
+				controller: 'yoAccountsCtrl'
+			})
+		.when('/final', {
+				templateUrl: 'yo-checkout-final-tpl',
+				controller: 'yoFinalCheckoutCtrl'
+			})
 		.when('/orders', {
 				templateUrl: 'yo-orders-tpl',
 				controller: 'yoOrdersCtrl'
@@ -53,10 +61,6 @@ YoApp.config(function($routeProvider, $locationProvider) {
 		.when('/account', {
 				templateUrl: 'yo-accounts-tpl',
 				controller: 'yoAccountsCtrl'
-			})
-		.when('/final', {
-				templateUrl: 'yo-checkout-final-tpl',
-				controller: 'yoCheckoutCtrl'
 			})
 		.otherwise({
 			redirectTo: '/'
@@ -70,7 +74,7 @@ YoApp.config(function($routeProvider, $locationProvider) {
 * All UI element controllers
 ********************************************************************/
 /* controller for main application handling */
-YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, service_session, service_basket, service_products) {
+YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, service_accounts, service_session, service_basket, service_products) {
 	if (!service_session.isLoggedin()) window.location.href = '#/login';
 	else {
 		$rootScope.model = $rootScope.model || {};
@@ -78,8 +82,8 @@ YoApp.controller('yoMainCtrl', function($scope, $rootScope, $routeParams, servic
 		$rootScope.model.basket = service_basket.all() || [];
 		$rootScope.model.products = $rootScope.model.products || getProducts();
 		$rootScope.model.orders = $rootScope.model.orders || [];
+		$scope.model.account = $rootScope.model.account || service_accounts.get({id: $rootScope.model.user._id});
 	}
-
 	function getProducts() {
 		console.log('CALLING getProducts')
 		var ps;
@@ -244,33 +248,62 @@ YoApp.controller('yoBasketMenuCtrl', function($scope, service_basket) {
 	//$scope.model.basket = service_basket.all();
 });
 
-/* contoller for handling interactions with product details */
-YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_basket, service_orders, service_accounts) {
+/* contoller for listing final order before completing purchase */
+YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
+	//$('div.message').hide().removeClass('hide');
+
+	$scope.cancel = function() {
+    	service_basket.reset();
+    	window.location.href = '#/home';
+  	}
+
+});
+
+/* contoller for handling final checkout */
+YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket) {
 	var ps;
 	$('div.message').hide().removeClass('hide');
 
 	$scope.order = {
 		total: 0
-	    , subtotal: 0
+		, subtotal: 0
+		, tax: 0
 		, shipping: 25
 	};
 
 	var items = service_basket.all();
 
-	items.forEach(function(v) {
-		$scope.order.subtotal += v.total;
-	});
+	//  items.forEach(function(v) {
+	//    $scope.order.subtotal += v.total;
+	//  });
+
+	$scope.order.subtotal = service_basket.subtotal();
 
 	if (items.length) $scope.order.total = $scope.order.subtotal + $scope.order.shipping;
 	else $scope.order.shipping = 0;
 
-	if (service_session.isLoggedin() && ('model' in $scope)) {
-		ps = service_accounts.get({id: $scope.model.user._id
-			} ,function() {
-				$scope.model.account = ps;
-			} ,function() {
-				console.log('failed to load account: ', ps)
-		});
+	$scope.saveStripeIdToDb = function(token) {
+	//doing checkout
+		var body = {
+		  subtotal: $scope.order.subtotal
+		  , shipping: $scope.order.shipping
+		  , items: service_basket.all()
+		  , stripe_token: token
+		};
+
+		service_orders.save(JSON.stringify(body)
+		  ,function(data) {
+		    service_basket.reset();
+		    window.location.href = '#/home';
+		  }
+		  ,function(err) {
+		    console.log('Orders API error: ', err);
+		    $('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").show();
+		  });
+	}
+
+	$scope.getTax = function() {
+		return service_basket.getTax($scope.model.user);
 	}
 
 	$scope.cancel = function() {
@@ -278,25 +311,6 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_session, service_bas
 		window.location.href = '#/home';
 	}
 
-	$scope.saveStripeIdToDb = function(token) {
-		//doing checkout
-		var body = {
-			subtotal: $scope.order.subtotal
-			, shipping: $scope.order.shipping
-			, items: service_basket.all()
-			, stripe_token: token
-		};
-
-		service_orders.save(JSON.stringify(body)
-			,function(data) {
-				service_basket.reset();
-				window.location.href = '#/home';
-			}
-			,function(err) {
-				console.log('Orders API error: ', err);
-				$('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").show();
-			});
-	}
 });
 
 /* contoller for handling interactions with product details */
@@ -314,31 +328,47 @@ YoApp.controller('yoOrdersCtrl', function($scope, service_orders, service_sessio
 
 /* contoller for handling customer account details */
 YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_session) {
-	var ps;
-	if (service_session.isLoggedin()) {
-		ps = service_accounts.get({id: $scope.model.user._id
-			} ,function() {
-				$scope.model.account = ps;
-			} ,function() {
-				console.log('failed to load account: ', ps)
-		});
-	}
+	var msg = angular.element('div.message');
+
+	if (!msg.hasClass('hide')) msg.addClass('hide');
 
 	$scope.formatDate = function(msg) {
 		var m = moment(msg);
 		return m.fromNow();
 	}
 
-	$scope.account_update = function() {
+	$scope.account_update = function(next) {
 		$scope.model.account.id = $scope.model.account._id;
 		$scope.model.account.$save(function(resp) {
 			if ('error' in resp) {
 				console.log('error saving account info: ', resp);
+				msg.html('<p>Failed to save account changes.  Please try again later.</p>')
+				if (!msg.hasClass('alert-error')) msg.addClass('alert-error');
+				if (msg.hasClass('alert-success')) msg.removeClass('alert-success');
+				if (msg.hasClass('hide')) msg.removeClass('hide')
 			} else {
+				msg.html('<p>Changes saved successfully</p>')
+				if (msg.hasClass('alert-error')) msg.removeClass('alert-error');
+				if (!msg.hasClass('alert-success')) msg.addClass('alert-success');
+				if (msg.hasClass('hide')) msg.removeClass('hide');
 				console.log('account info saved: ', resp);
+				window.location.href = '#/' + (next || 'home');
 			}
 		});
+	}
 
+	$scope.validate = function() {
+		if (($scope.model.account.address.billing.street && $scope.model.account.address.billing.street.length) &&
+			($scope.model.account.address.billing.state && $scope.model.account.address.billing.state.length) &&
+			($scope.model.account.address.shipping.state && $scope.model.account.address.shipping.state.length) &&
+			($scope.model.account.address.shipping.street && $scope.model.account.address.shipping.street.length)) {
+			$scope.account_update('final');
+		} else {
+			msg.html('<p>Please fill in all required fields</p>')
+			if (!msg.hasClass('alert-error')) msg.addClass('alert-error');
+			if (msg.hasClass('alert-success')) msg.removeClass('alert-success');
+			if (msg.hasClass('hide')) msg.removeClass('hide')
+		}
 	}
 
 	$scope.account_cancel = function() {
@@ -492,6 +522,34 @@ YoApp.directive('yoStripeForm', function() {
 	}
 });
 
+YoApp.directive('yoShippingCheckbox', function() {
+	var linkFn = function(scope, el, attr) {
+		scope.$watch('iShipping', function(n, o) {
+			scope.temp = scope.temp || scope.model.account.address.shipping;
+			if (n === true && o === true) return;
+			if (n) {
+				angular.element('.shipping').addClass('hide');
+				angular.element('#iShipping').attr('checked', true)
+				scope.temp = scope.model.account.address.shipping;
+				scope.model.account.address.shipping = scope.model.account.address.billing;
+			} else {
+				angular.element('.shipping').removeClass('hide');
+				angular.element('#iShipping').attr('checked', false);
+				scope.model.account.address.shipping = scope.temp;
+			}
+		});
+
+		if ((scope.model.account.address.billing.street !== scope.model.account.address.shipping.street) ||
+			  (scope.model.account.address.billing.city !== scope.model.account.address.shipping.city)) {
+			scope.iShipping = false;
+		} else scope.iShipping = true;
+	}
+
+	return {
+		restrict: 'A',
+		link: linkFn
+	}
+})
 /*******************************************************************
 * Filters
 * 
