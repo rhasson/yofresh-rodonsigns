@@ -11,7 +11,6 @@ var Users = require('./users')
 module.exports = exports = {
 	base: {
 		login: function(req, resp, next) {
-			console.log(req.body)
 			db.auth(req.body.email, req.body.password)
 			.then(function(auth) {
 				req.session.user_id = auth._id;
@@ -22,6 +21,7 @@ module.exports = exports = {
 				resp.json(auth);
 			})
 			.fail(function(err) {
+				console.log(err);
 				resp.json({error: {code: 2, message: 'login failed'}});
 			});
 		},

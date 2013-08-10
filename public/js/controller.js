@@ -257,12 +257,15 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
     	window.location.href = '#/home';
   	}
 
+  	$scope.remove = function() {
+  		service_basket.remove($scope.item._id);
+  		$scope.model.basket = service_basket.all();
+	}
 });
 
 /* contoller for handling final checkout */
-YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket) {
+YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service_orders) {
 	var ps;
-	$('div.message').hide().removeClass('hide');
 
 	$scope.order = {
 		total: 0
@@ -273,13 +276,10 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket) {
 
 	var items = service_basket.all();
 
-	//  items.forEach(function(v) {
-	//    $scope.order.subtotal += v.total;
-	//  });
-
 	$scope.order.subtotal = service_basket.subtotal();
+	$scope.order.tax = service_basket.tax();
 
-	if (items.length) $scope.order.total = $scope.order.subtotal + $scope.order.shipping;
+	if (items.length) $scope.order.total = service_basket.total() + $scope.order.shipping;
 	else $scope.order.shipping = 0;
 
 	$scope.saveStripeIdToDb = function(token) {
@@ -287,6 +287,7 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket) {
 		var body = {
 		  subtotal: $scope.order.subtotal
 		  , shipping: $scope.order.shipping
+		  , tax: $scope.order.tax
 		  , items: service_basket.all()
 		  , stripe_token: token
 		};
@@ -298,12 +299,12 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket) {
 		  }
 		  ,function(err) {
 		    console.log('Orders API error: ', err);
-		    $('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").show();
+		    angular.element('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").removeClass('hide');
 		  });
 	}
 
 	$scope.getTax = function() {
-		return service_basket.getTax($scope.model.user);
+		return service_basket.tax();
 	}
 
 	$scope.cancel = function() {

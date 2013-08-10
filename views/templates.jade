@@ -116,7 +116,7 @@ script(type='text/ng-template', id='yo-checkout-tpl')
         tbody
           tr(ng-repeat='item in model.basket', data-yo-checkout-items)
     div.row
-      div.span6.pull-right
+      div.span6
         p
           a.btn.btn-primary(href='#/address') Checkout
           a.btn(href='#/home') Continue Shopping
@@ -128,6 +128,7 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.quantity}}
   td ${{item.price}}
   td ${{item.total}}
+  td: a(href ng-click='remove()') Remove
 
 script(type='text/ng-template', id='yo-checkout-final-tpl')
   div.span8
