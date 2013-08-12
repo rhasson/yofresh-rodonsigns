@@ -207,7 +207,7 @@ script(type='text/ng-template', id='yo-accounts-tpl')
           div.control-group
             label.control-label(for='bState') State:
             div.controls
-              input(type='text', id='bState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.address.billing.state')
+              span(data-yo-state-list, state='model.account.address.billing.state')
           div.control-group
             label.control-label(for='bZip') Zip Code:
             div.controls
@@ -227,7 +227,7 @@ script(type='text/ng-template', id='yo-accounts-tpl')
           div.control-group
             label.control-label(for='sState') State:
             div.controls
-              input(type='text', id='sState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.address.shipping.state')
+              span(data-yo-state-list, state='model.account.address.shipping.state')
           div.control-group
             label.control-label(for='sZip') Zip Code:
             div.controls
@@ -260,7 +260,7 @@ script(type='text/ng-template', id='yo-address-confirmation-tpl')
         div.control-group
           label.control-label(for='bState') State:
           div.controls
-            input(type='text', id='bState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.address.billing.state')
+            span(data-yo-state-list, state='model.account.address.billing.state')
         div.control-group
           label.control-label(for='bZip') Zip Code:
           div.controls
@@ -280,7 +280,7 @@ script(type='text/ng-template', id='yo-address-confirmation-tpl')
         div.control-group
           label.control-label(for='sState') State:
           div.controls
-            input(type='text', id='sState', inputmode='verbatim', placeholder='State abbreviation', ng-model='model.account.address.shipping.state')
+            span(data-yo-state-list, state='model.account.address.shipping.state')
         div.control-group
           label.control-label(for='sZip') Zip Code:
           div.controls

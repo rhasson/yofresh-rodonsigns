@@ -550,7 +550,73 @@ YoApp.directive('yoShippingCheckbox', function() {
 		restrict: 'A',
 		link: linkFn
 	}
-})
+});
+
+YoApp.directive('yoStateList', function() {
+	return {
+		restrict: 'A',
+		scope: {
+			state: '='
+		},
+		controller: ['$scope', '$element', function($scope, $el) {
+			$scope.list = [
+			    {abbriv: 'AL', name: 'Alabama'},
+			    {abbriv: 'AK', name: 'Alaska'},
+			    {abbriv: 'AZ', name: 'Arizona'},
+			    {abbriv: 'AR', name: 'Arkansas'},
+			    {abbriv: 'CA', name: 'California'},
+			    {abbriv: 'CO', name: 'Colorado'},
+			    {abbriv: 'CT', name: 'Connecticut'},
+			    {abbriv: 'DE', name: 'Delaware'},
+			    {abbriv: 'DC', name: 'District Of Columbia'},
+			    {abbriv: 'FL', name: 'Florida'},
+			    {abbriv: 'GA', name: 'Georgia'},
+			    {abbriv: 'HI', name: 'Hawaii'},
+			    {abbriv: 'ID', name: 'Idaho'},
+			    {abbriv: 'IL', name: 'Illinois'},
+			    {abbriv: 'IN', name: 'Indiana'},
+			    {abbriv: 'IA', name: 'Iowa'},
+			    {abbriv: 'KS', name: 'Kansas'},
+			    {abbriv: 'KY', name: 'Kentucky'},
+			    {abbriv: 'LA', name: 'Louisiana'},
+			    {abbriv: 'ME', name: 'Maine'},
+			    {abbriv: 'MD', name: 'Maryland'},
+			    {abbriv: 'MA', name: 'Massachusetts'},
+			    {abbriv: 'MI', name: 'Michigan'},
+			    {abbriv: 'MN', name: 'Minnesota'},
+			    {abbriv: 'MS', name: 'Mississippi'},
+			    {abbriv: 'MO', name: 'Missouri'},
+			    {abbriv: 'MT', name: 'Montana'},
+			    {abbriv: 'NE', name: 'Nebraska'},
+			    {abbriv: 'NV', name: 'Nevada'},
+			    {abbriv: 'NH', name: 'New Hampshire'},
+			    {abbriv: 'NJ', name: 'New Jersey'},
+			    {abbriv: 'NM', name: 'New Mexico'},
+			    {abbriv: 'NY', name: 'New York'},
+			    {abbriv: 'NC', name: 'North Carolina'},
+			    {abbriv: 'ND', name: 'North Dakota'},
+			    {abbriv: 'OH', name: 'Ohio'},
+			    {abbriv: 'OK', name: 'Oklahoma'},
+			    {abbriv: 'OR', name: 'Oregon'},
+			    {abbriv: 'PA', name: 'Pennsylvania'},
+			    {abbriv: 'RI', name: 'Rhode Island'},
+			    {abbriv: 'SC', name: 'South Carolina'},
+			    {abbriv: 'SD', name: 'South Dakota'},
+			    {abbriv: 'TN', name: 'Tennessee'},
+			    {abbriv: 'TX', name: 'Texas'},
+			    {abbriv: 'UT', name: 'Utah'},
+			    {abbriv: 'VT', name: 'Vermont'},
+			    {abbriv: 'VA', name: 'Virginia'},
+			    {abbriv: 'WA', name: 'Washington'},
+			    {abbriv: 'WV', name: 'West Virginia'},
+			    {abbriv: 'WI', name: 'Wisconsin'},
+			    {abbriv: 'WY', name: 'Wyomin'}
+			]
+		}],
+		template: "<select name='states' ng-model='state' ng-options='l.abbriv as l.name for l in list' required> " +
+				    "<option value='' selected='selected'> Select a State</option>"
+	}
+});
 /*******************************************************************
 * Filters
 * 

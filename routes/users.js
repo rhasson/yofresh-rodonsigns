@@ -51,6 +51,7 @@ module.exports = exports = {
 			delete req.body._rev;
 			db.update('users', req.params.id, req.body)
 			.then(function(doc) {
+				delete doc.password;
 				resp.json(doc);	
 			})
 			.fail(function(err) {
