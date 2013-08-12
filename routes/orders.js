@@ -84,7 +84,7 @@ module.exports = exports = {
 				  items: items
 				, subtotal: parseFloat(req.body.subtotal)
 				, shipping: parseFloat(req.body.shipping)
-				, total: parseFloat(req.body.subtotal) + parseFloat(req.body.shipping)
+				, total: parseFloat(req.body.subtotal) + parseFloat(req.body.shipping) + parseFloat(req.body.tax)
 				, tax: parseFloat(req.body.tax)
 				, status_code: status_messages.indexOf(status_messages[0])
 				, status_message: status_messages[0]
