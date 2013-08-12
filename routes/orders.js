@@ -85,6 +85,7 @@ module.exports = exports = {
 				, subtotal: parseFloat(req.body.subtotal)
 				, shipping: parseFloat(req.body.shipping)
 				, total: parseFloat(req.body.subtotal) + parseFloat(req.body.shipping)
+				, tax: parseFloat(req.body.tax)
 				, status_code: status_messages.indexOf(status_messages[0])
 				, status_message: status_messages[0]
 				, stripe_token_id: req.body.stripe_token.id

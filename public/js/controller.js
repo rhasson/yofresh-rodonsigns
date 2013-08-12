@@ -287,7 +287,7 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service
 		var body = {
 		  subtotal: $scope.order.subtotal
 		  , shipping: $scope.order.shipping
-		  , tax: $scope.order.tax
+		  , tax: $scope.order.tax || 0
 		  , items: service_basket.all()
 		  , stripe_token: token
 		};
