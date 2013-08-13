@@ -186,21 +186,27 @@ YoAdminApp.directive('yoAdminProductList', function() {
 /* list a summary of all orders */
 YoAdminApp.directive('yoAdminOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
+		var label = el.find('.label');
 		if ('payment' in scope.order) {
 			if (scope.order.payment.paid) {
-				scope.labelName = 'Paid';
-				scope.labelClass = 'label-success';
+				label.html('Paid');
+				if (!label.hasClass('label-success')) label.addClass('label-success');
+				label.removeClass('label-warning label-important');
 			} else {
-				scope.labelName = 'Not Paid';
-				scope.labelClass = 'label-warning';
+				label.html('Not Paid');
+				if (!label.hasClass('label-warning')) label.addClass('label-warning');
+				label.removeClass('label-success label-important');
 			}
 			if (scope.order.payment.failure_code) {
-				scope.labelName = scope.order.payment.failure_message;
-				scope.labelClass = 'label-important';
+				label.html('Error');
+				if (!label.hasClass('label-important')) label.addClass('label-important');
+				label.removeClass('label-success label-warning');
+				console.log('Payment error: ', scope.order.payment.failure_message);
 			}
 		} else {
-			scope.labelName = 'Not Paid';
-			scope.labelClass = 'label-warning';
+			label.html('Not Paid');
+			if (!label.hasClass('label-warning')) label.addClass('label-warning');
+			label.removeClass('label-success label-important');
 		}
 	};
 
@@ -208,24 +214,26 @@ YoAdminApp.directive('yoAdminOrdersSummary', function() {
 		restrict: 'A',
 		controller: ['$scope', '$element', 'service_payments', 'service_orders',
 		function($scope, $el, s_pay, s_order) {
+			var div = $el.find('div.detail');
 
-			$scope.setLabelClass = function() {
-				return $scope.labelClass || 'label-info';
-			};
 			$scope.formatDate = function(msg) {
 				var m = moment(msg);
 				return m.fromNow();
 			};
 			$scope.showDetail = function() {
-				var div = $el.find('div.detail');
 				div.toggleClass('hidden');
 			};
 			$scope.captureCharge = function(id) {
-				var o;
+				var label = $el.find('.label');
+				var btn = $el.find('.btn');
+				console.log(label)
+
+				btn.attr('disabled', true);
 				s_pay.save({id: id, body: {capture_charge: true}}, 
 				function(d) {
 					if ('id' in d) {
-						o = s_order.get({id: d.id},
+						console.log(d);
+						s_order.get({id: d.id},
 							function(doc) {
 								console.log('new order doc: ', doc)
 								var t = $scope.model.orders.map(function(v) {
@@ -236,15 +244,20 @@ YoAdminApp.directive('yoAdminOrdersSummary', function() {
 								$scope.model.orders = t;
 							},
 							function(err) {
-								$scope.labelName = 'Failed to charge card'
-								$scope.labelClass = 'label-important';
-								console.log('failed to capture charges', err)
+								console.log('failed to get updated order', err)
 							});
 					}
 					console.log('catured successfully', d);
+					label.html('Paid');
+					if (!label.hasClass('label-success')) label.addClass('label-success');
+					label.removeClass('label-warning label-important');
 				},
 				function(err) {
+					label.html('Failed to charge card');
+					if (!label.hasClass('label-important')) label.addClass('label-important');
+					label.removeClass('label-success label-warning');
 					console.log('failed to capture charges', err);
+					btn.attr('disabled', false);
 				});
 			}
 		}],

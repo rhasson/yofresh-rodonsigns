@@ -395,20 +395,23 @@ YoApp.directive('yoProductDetailShort', function() {
 	var linkFn = function(scope, element, attrs) {
 		var b = scope.get(scope.item._id);
 		var price;
-		scope.ssize = scope.item.sizes[0];
-		price = scope.ssize ? scope.ssize.price : parseFloat(scope.item.price);
+		if ('code' in scope.item && scope.item.code >= 0) window.location.href = '#/logout'
+		else {
+			scope.ssize = scope.item.sizes[0];
+			price = scope.ssize ? scope.ssize.price : parseFloat(scope.item.price);
 
-		scope.new_quantity = scope.new_quantity || parseFloat(scope.item.default_quantity);
-		if (b) scope.new_quantity = b.quantity;
+			scope.new_quantity = scope.new_quantity || parseFloat(scope.item.default_quantity);
+			if (b) scope.new_quantity = b.quantity;
 
-		//scope.total = price * scope.new_quantity;
-		//console.log('MAKING TOTAL: ', scope.total)
+			//scope.total = price * scope.new_quantity;
+			//console.log('MAKING TOTAL: ', scope.total)
 
-		$(element).find('.quantity').change(function() {
-			scope.new_quantity = parseFloat($(this).val());
-		//	scope.total = price * scope.new_quantity;
-			//scope.$apply();
-		});
+			$(element).find('.quantity').change(function() {
+				scope.new_quantity = parseFloat($(this).val());
+			//	scope.total = price * scope.new_quantity;
+				//scope.$apply();
+			});
+		}
 	}
 
 	return {
@@ -450,18 +453,15 @@ YoApp.directive('yoOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
 		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
 			el.removeAttr('class');
-			el.addClass('ng-scope');
-			el.addClass('warning');
+			el.addClass('ng-scope warning');
 		}
 		if (scope.order.status_code >= 3 && scope.order.status_code <= 5) {
 			el.removeAttr('class');
-			el.addClass('ng-scope');
-			el.addClass('success');
+			el.addClass('ng-scope success');
 		}
 		if (scope.order.status_code >= 6 && scope.order.status_code <= 9) {
 			el.removeAttr('class');
-			el.addClass('ng-scope');
-			el.addClass('error');
+			el.addClass('ng-scope error');
 		}
 	};
 
