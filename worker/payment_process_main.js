@@ -53,7 +53,9 @@ jobs.process('capture charges', 10, function(job, done) {
     })
     .then(function(charge) {
       console.log('PAYMENT CAPTURED: ', charge.id);
-      return db.update('orders', order_id, {payment: charge});
+      db.update('orders', order_id, {payment: charge})
+      .then(function() { done(); })
+      .fail(function(e) { done(e); })
     })
     .fail(function(err) {
       console.log('strip charge failed: ', err);

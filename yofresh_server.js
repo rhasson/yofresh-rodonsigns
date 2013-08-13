@@ -67,8 +67,8 @@ server.get('/api/v0/users/:id', routes.api.v0.users.list);
 server.post('/api/v0/users', routes.api.v0.users.save);
 server.post('/api/v0/users/:id', routes.api.v0.users.update);
 
-server.get('/api/v0/payments', routes.api.v0.payments.list);
-server.get('/api/v0/payments/:id', routes.api.v0.payments.list);
+//server.get('/api/v0/payments', routes.api.v0.payments.list);
+//server.get('/api/v0/payments/:id', routes.api.v0.payments.list);
 //server.post('/api/v0/payments', routes.api.v0.users.save);
 server.post('/api/v0/payments/:id', routes.api.v0.payments.update);
 
