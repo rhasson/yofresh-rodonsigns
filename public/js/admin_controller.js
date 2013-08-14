@@ -226,7 +226,9 @@ YoAdminApp.directive('yoAdminOrdersSummary', function() {
 			$scope.captureCharge = function(id) {
 				var label = $el.find('.label');
 				var btn = $el.find('.btn');
-				console.log(label)
+				console.log(label);
+
+				if (btn.attr('disabled') === 'disabled') return false;
 
 				btn.attr('disabled', true);
 				s_pay.save({id: id, body: {capture_charge: true}}, 
