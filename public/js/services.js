@@ -139,7 +139,6 @@ angular.module('YoApp.services.Basket', [])
 
 		Basket.prototype.tax = function() {
 			var t, state;
-			console.log(root);
 			if ('model' in root && 'account' in root.model) {
 				if (root.model.account.address.billing.state === 'PA') return this.subtotal() * this._tax;
 				else return 0;

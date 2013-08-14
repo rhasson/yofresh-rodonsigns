@@ -20,7 +20,9 @@ jobs.process('create stripe customer', 10, function(job, done) {
       })
       .then(function(customer) {
         console.log('CREATED STRIPE CUSTOMER', customer.id);
-        return db.update('users', job.data.user_id, {stripe_customer: customer})
+        db.update('users', job.data.user_id, {stripe_customer: customer})
+        .then(function() { done(); })
+        .fail(function(e) { done(e); });
       })
       .fail(function(e) {
         console.log('failed to create stripe customer: ', e);
@@ -29,9 +31,6 @@ jobs.process('create stripe customer', 10, function(job, done) {
     } else {
       done();
     }
-  })
-  .then(function(doc) {
-    done();
   })
   .fail(function(e) {
     done(e);
@@ -55,7 +54,7 @@ jobs.process('capture charges', 10, function(job, done) {
       console.log('PAYMENT CAPTURED: ', charge.id);
       db.update('orders', order_id, {payment: charge})
       .then(function() { done(); })
-      .fail(function(e) { done(e); })
+      .fail(function(e) { done(e); });
     })
     .fail(function(err) {
       console.log('strip charge failed: ', err);

@@ -294,12 +294,21 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service
 
 		service_orders.save(JSON.stringify(body)
 		  ,function(data) {
-		    service_basket.reset();
-		    window.location.href = '#/home';
+		  	if ('error' in data) {
+				angular.element('div.message')
+				  .html("<p>There was a problem with your card, please verify and try again</p>")
+				  .removeClass('hide');
+				console.log('Orders API error: ', data);
+		  	} else {
+		    	service_basket.reset();
+		    	window.location.href = '#/home';
+		  	}
 		  }
 		  ,function(err) {
 		    console.log('Orders API error: ', err);
-		    angular.element('div.message').html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>").removeClass('hide');
+		    angular.element('div.message')
+		      .html("<p>Failed to place order, please contact RodonSigns at 215-885-5358</p>")
+		      .removeClass('hide');
 		  });
 	}
 

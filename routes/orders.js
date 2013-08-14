@@ -70,17 +70,18 @@ module.exports = exports = {
 	},
 	save: function(req, resp, next) {
 		var s = crypto.createHash('md5');
+		var items, order, temp, p;
 		s.update((Math.floor((Math.random() * 999888))).toString());
 		
 		if (req.session && 'name' in req.session) {
-			var items = req.body.items.map(function(v) {
+			items = req.body.items.map(function(v) {
 				v.product_id = v._id;
 				delete v._id;
 				delete v._rev;
 				delete v.$$hashKey;
 				return v;
 			});
-			var order = {
+			order = {
 				  items: items
 				, subtotal: parseFloat(req.body.subtotal)
 				, shipping: parseFloat(req.body.shipping)
@@ -99,39 +100,37 @@ module.exports = exports = {
 				  , email: req.session.email
 				}
 			};
+			temp = {
+				  user_id: req.session.user_id
+				, name: req.session.name.first
+				, email: req.session.email
+				, stripe_token: order.stripe_token
+			};
 
-			db.save('orders', req.session.user_id, order)
-			.then(function(doc) {
-				var d, j, p;
-				d = {
-					  user_id: req.session.user_id
-					, name: req.session.name.first
-					, email: req.session.email
-					, order_id: doc._id
-				};
-
-				d.stripe_token = order.stripe_token;
-
-				console.log(d)
-				p = jobs.create('create stripe customer', d);
-				p.on('failed', function(e) {
-					console.log('create stripe customer job failed: ', e);
-				});
-				p.on('complete', function() {
-					delete d.stripe_token;
-					j = jobs.create('order confirmation', d);
+			p = jobs.create('create stripe customer', temp);
+			p.on('failed', function(e) {
+				console.log('create stripe customer job failed: ', temp, e);
+				resp.json({error: {code: 5, message: 'Card error'}});
+			});
+			p.on('complete', function() {
+				db.save('orders', req.session.user_id, order)
+				.then(function(doc) {
+					var j;
+					delete temp.stripe_token;
+					temp.order_id = doc._id;
+					j = jobs.create('order confirmation', temp);
 					j.on('failed', function(e) {
-						console.log('order confirmation job failed: ', e);
+						console.log('order confirmation job failed: ', temp, e);
 					});
 					j.save();
+					resp.json(doc);
+				})
+				.fail(function(e) {
+					console.log('failed to save order to db ', e);
+					resp.json({error: {code: 0, message: 'failed to save order'}});
 				});
-				p.attempts(3).save();
-
-				resp.json(doc);
-			})
-			.fail(function(err) {
-				resp.json({error: {code: 0, message: 'failed to save product'}});
 			});
+			p.attempts(3).save();
 		} else {
 			resp.json({error: {code: 0, message: 'no valid session present'}});
 		}
