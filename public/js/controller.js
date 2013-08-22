@@ -205,18 +205,20 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 });
 
 /* product list controller to retreive all products from db */
-YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, service_products) {
-/*	var ps;
-	if (service_session.isLoggedin()) {
-		ps = service_products.query({
-			} ,function() {
-				$('div.loading').remove();
-				$scope.model.products = ps;
-			} ,function() {
-				$('div.loading').html('Failed to retrieve product');
-		});
-	}*/
-});
+
+//div.span9(ng-controller='yoProductCtrl', data-spy='scroll', data-target='.bs-docs-sidenav')
+
+//YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, service_products) {
+/*		var flavors = [], t;
+		if ($scope.product.flavors) {
+			console.log($scope.product.flavors)
+			$scope.product.flavors.split(',').forEach(function(v) {
+				t = v.trim();
+				if (t !== '') flavors.push(t);
+			});
+		}
+*/
+//});
 
 /* contoller for handling interactions with product details */
 YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
@@ -277,10 +279,13 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service
 	var items = service_basket.all();
 
 	$scope.order.subtotal = service_basket.subtotal();
-	$scope.order.tax = service_basket.tax();
 
-	if (items.length) $scope.order.total = service_basket.total() + $scope.order.shipping;
+	if (items.length) service_basket.shipping = $scope.order.shipping;  // really ugly hack
 	else $scope.order.shipping = 0;
+
+	$scope.order.total = service_basket.total();
+
+	$scope.order.tax = service_basket.tax();
 
 	$scope.saveStripeIdToDb = function(token) {
 	//doing checkout
@@ -390,7 +395,7 @@ YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_se
 * Directives
 * All UI element directives
 ********************************************************************/
-/* create product detail ui elements */
+/* create product detail ui elements 
 YoApp.directive('yoProductDetail', function() {
 	return {
 		restrict: 'A',
@@ -398,7 +403,7 @@ YoApp.directive('yoProductDetail', function() {
 		controller: 'yoProductDetailCtrl'
 	}
 });
-
+*/
 /* create product detail ui elements */
 YoApp.directive('yoProductDetailShort', function() {
 	var linkFn = function(scope, element, attrs) {
@@ -561,6 +566,56 @@ YoApp.directive('yoShippingCheckbox', function() {
 	}
 });
 
+YoApp.directive('yoProductFlavors', function() {
+	var linkFn = function(scope, el, attr) {
+		var t;
+		scope.item.selected_flavors = scope.item.selected_flavors || [];
+		scope.item.selected_flavors['one'] = true;
+		scope.flavors = [];
+		if ('flavors' in scope.item && scope.item.flavors.length) {
+			scope.item.flavors.split(',').forEach(function(v) {
+				t = v.trim();
+				if (t !== '') scope.flavors.push(t);
+			});
+		}
+	}
+
+	return {
+		restrict: 'A',
+		link: linkFn,
+		templateUrl: 'yo-product-flavors-tpl'
+	}
+});
+
+//TODO: save selected_flavors to db
+
+YoApp.directive('yoProductFlavorsItems', function() {
+	var linkFn = function(scope, el, attr) {
+		var i = el.find('input');
+		var f = clean(scope.flavor);
+		i.attr('checked', scope.item.selected_flavors[f] || false);
+	}
+	return {
+		restrict: 'A',
+		link: linkFn,
+		controller: ['$scope', '$element', function($scope, $el) {
+			$scope.check = function() {
+				var f = clean($scope.flavor);
+				var i = $el.find('input');
+				if (i.attr('checked')) {
+					i.attr('checked', false);
+					$scope.item.selected_flavors[f] = false;
+				}
+				else {
+					i.attr('checked', true);
+					$scope.item.selected_flavors[f] = false;
+				}
+			}
+		}],
+		templateUrl: 'yo-product-flavors-items-tpl'
+	}
+});
+
 YoApp.directive('yoStateList', function() {
 	return {
 		restrict: 'A',
@@ -631,3 +686,12 @@ YoApp.directive('yoStateList', function() {
 * 
 ********************************************************************/
 
+
+/*******************************************************************
+* Utilities
+* 
+********************************************************************/
+
+function clean(txt) {
+	return txt.toLowerCase().replace(/\W/ig, '');
+}

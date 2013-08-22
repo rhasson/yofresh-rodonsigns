@@ -100,6 +100,7 @@ angular.module('YoApp.services.Basket', [])
 		function Basket() {
 			this._basket = [];
 			this._tax = 6 / 100;
+			this.shipping = 0;
 		}
 
 		Basket.prototype.set = function(item) {
@@ -140,14 +141,14 @@ angular.module('YoApp.services.Basket', [])
 		Basket.prototype.tax = function() {
 			var t, state;
 			if ('model' in root && 'account' in root.model) {
-				if (root.model.account.address.billing.state === 'PA') return this.subtotal() * this._tax;
+				if (root.model.account.address.billing.state === 'PA') return ((this.subtotal() + this.shipping) * this._tax);
 				else return 0;
 			}
 			else return -1;
 		}
 
 		Basket.prototype.total = function() {
-			return this.subtotal() + this.tax();
+			return this.subtotal() + this.shipping + this.tax();
 		}
 
 		Basket.prototype.subtotal = function() {

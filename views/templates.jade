@@ -68,7 +68,7 @@ script(type='text/ng-template', id='yo-home-tpl')
         i.icon-chevron-right
       li(ng-class='makeActive("M")'): a(href='#/home/M') Additional Items
         i.icon-chevron-right
-  div.span9(ng-controller='yoProductCtrl', data-spy='scroll', data-target='.bs-docs-sidenav')
+  div.span9(data-spy='scroll', data-target='.bs-docs-sidenav')
     div.loading Loading...
     div.media(ng-repeat='item in model.page', data-yo-product-detail-short)
 
@@ -85,6 +85,7 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
       p Quantity: 
         input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
         span(ng-show='item.unit > 1') each is a set of {{item.unit}}
+      p(ng-show='item.flavors && item.flavors.length > 0', data-yo-product-flavors)
       p(ng-show='item.sizes.length > 1') Price: ${{ssize.price}}
       p(ng-show='item.sizes.length == 1') Price: ${{item.sizes[0].price}}
       p(ng-show='item.sizes.length <= 0') Price: ${{item.price}}
@@ -290,3 +291,12 @@ script(type='text/ng-template', id='yo-address-confirmation-tpl')
       p Is shipping address same as billing?  
         input(data-yo-shipping-checkbox, type='checkbox', id='iShipping', ng-model='iShipping', checked)
       a.btn.btn-primary(href, ng-click='validate()') Continue
+
+script(type='text/ng-template', id='yo-product-flavors-tpl')
+  p Select Flavors:
+  span(ng-repeat='flavor in flavors', data-yo-product-flavors-items)
+
+script(type='text/ng-template', id='yo-product-flavors-items-tpl')
+  label.checkbox.inline
+    input(type='checkbox', ng-click='check()')
+    {{flavor}}&nbsp;&nbsp;&nbsp;&nbsp;
