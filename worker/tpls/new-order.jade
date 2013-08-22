@@ -16,10 +16,14 @@ div
     tbody
       each item in items
         tr
-          td= item.name
+          if (('selected_flavors' in item) && item.selected_flavors.length > 0)
+            td= item.name + ' (' + item.selected_flavors.toString() + ')'
+          else
+            td= item.name + 'X'
           td= item.quantity
           td= item.total
 
+  p Subtotal: $#{subtotal}
   p Shipping: $#{shipping}
   p Tax: $#{tax}
   p Total payment: $#{total}

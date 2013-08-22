@@ -148,11 +148,15 @@ Mail.prototype.create_new_order = function(fields) {
                 'Your order confirmation number is: ' + fields.confirmation_number + ' \r\n\r\n' +
                 'Order Summary:\n';
             fields.items.forEach(function(v) {
-                tpl += v.name + ' - quantity of: ' + v.quantity + ' - total: $' + v.total; 
+                tpl += v.name;
+                if (('selected_flavors' in v) && v.selected_flavors.length > 0) tpl += '(' + v.selected_flavors.toString() + ')';
+                else tpl += ' - quantity of: ' + v.quantity + ' - total: $' + v.total; 
             });
 
             tpl += '\r\n\r\n' +
+                    'subtotal: $' + field.subtotal + '\n' +
                     'shipping: $' + field.shipping + '\n' +
+                    'tax: $' + field.tax + '\n' +
                     'total payment: $' + fields.total;
             tpl += '\r\n\r\n' +
                 'If you have any questions don\'t hesitate to email or call us any time.\n' +

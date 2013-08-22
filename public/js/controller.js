@@ -204,22 +204,6 @@ YoApp.controller('yoRegisterCtrl', function($scope, service_session) {
 	}
 });
 
-/* product list controller to retreive all products from db */
-
-//div.span9(ng-controller='yoProductCtrl', data-spy='scroll', data-target='.bs-docs-sidenav')
-
-//YoApp.controller('yoProductCtrl', function($scope, $rootScope, service_session, service_products) {
-/*		var flavors = [], t;
-		if ($scope.product.flavors) {
-			console.log($scope.product.flavors)
-			$scope.product.flavors.split(',').forEach(function(v) {
-				t = v.trim();
-				if (t !== '') flavors.push(t);
-			});
-		}
-*/
-//});
-
 /* contoller for handling interactions with product details */
 YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 	$scope.add = function() {
@@ -276,7 +260,7 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service
 		, shipping: 25
 	};
 
-	var items = service_basket.all();
+	var items = service_basket.all(true);  //true tells function to clean up selected_flavors
 
 	$scope.order.subtotal = service_basket.subtotal();
 
@@ -293,7 +277,7 @@ YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service
 		  subtotal: $scope.order.subtotal
 		  , shipping: $scope.order.shipping
 		  , tax: $scope.order.tax || 0
-		  , items: service_basket.all()
+		  , items: items
 		  , stripe_token: token
 		};
 
@@ -395,15 +379,7 @@ YoApp.controller('yoAccountsCtrl', function($scope, service_accounts, service_se
 * Directives
 * All UI element directives
 ********************************************************************/
-/* create product detail ui elements 
-YoApp.directive('yoProductDetail', function() {
-	return {
-		restrict: 'A',
-		templateUrl: 'yo-product-detail-tpl',
-		controller: 'yoProductDetailCtrl'
-	}
-});
-*/
+
 /* create product detail ui elements */
 YoApp.directive('yoProductDetailShort', function() {
 	var linkFn = function(scope, element, attrs) {
@@ -570,7 +546,6 @@ YoApp.directive('yoProductFlavors', function() {
 	var linkFn = function(scope, el, attr) {
 		var t;
 		scope.item.selected_flavors = scope.item.selected_flavors || [];
-		scope.item.selected_flavors['one'] = true;
 		scope.flavors = [];
 		if ('flavors' in scope.item && scope.item.flavors.length) {
 			scope.item.flavors.split(',').forEach(function(v) {
@@ -593,22 +568,28 @@ YoApp.directive('yoProductFlavorsItems', function() {
 	var linkFn = function(scope, el, attr) {
 		var i = el.find('input');
 		var f = clean(scope.flavor);
-		i.attr('checked', scope.item.selected_flavors[f] || false);
+		i.attr('checked', scope.item.selected_flavors.indexOf(scope.flavor) >= 0 || false);
 	}
 	return {
 		restrict: 'A',
 		link: linkFn,
 		controller: ['$scope', '$element', function($scope, $el) {
 			$scope.check = function() {
-				var f = clean($scope.flavor);
+				var f = $scope.item.selected_flavors.indexOf($scope.flavor);
 				var i = $el.find('input');
 				if (i.attr('checked')) {
 					i.attr('checked', false);
-					$scope.item.selected_flavors[f] = false;
+					if (f >= 0) {
+						$scope.item.selected_flavors.splice(f, 1);
+					}
+					//$scope.item.selected_flavors[f] = false;
 				}
 				else {
 					i.attr('checked', true);
-					$scope.item.selected_flavors[f] = false;
+					//$scope.item.selected_flavors[f] = true;
+					if (f === -1) {
+						$scope.item.selected_flavors.push($scope.flavor);
+					}
 				}
 			}
 		}],

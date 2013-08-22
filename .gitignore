@@ -4,3 +4,4 @@ config.js
 rem_db.js
 .DS_Store
 dump.rdb
+worker/test.js
