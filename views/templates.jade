@@ -85,6 +85,8 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
       p Quantity: 
         input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
         span(ng-show='item.unit > 1') each is a set of {{item.unit}}
+      p(ng-show='item.details_field') {{item.details_field}}:&nbsp;&nbsp;
+        input.details(type='text', ng-model='item.details')
       p(ng-show='item.flavors && item.flavors.length > 0', data-yo-product-flavors)
       p(ng-show='item.sizes.length > 1') Price: ${{ssize.price}}
       p(ng-show='item.sizes.length == 1') Price: ${{item.sizes[0].price}}

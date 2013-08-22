@@ -52,6 +52,10 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         div.controls
           input(type='text', id='product_flavors', ng-model='product.flavors')
       div.control-group
+        label.control-label(for='product_details') Name of additional details field:
+        div.controls
+          input(type='text', id='product_details', ng-model='product.details_field')
+      div.control-group
         label.control-label(for='product_quantity') Default quantity:
         div.controls
           input(type='text', id='product_quantity', ng-model='product.default_quantity', required)
