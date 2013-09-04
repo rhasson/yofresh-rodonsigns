@@ -113,7 +113,8 @@ YoAdminApp.controller('yoAdminProductsNewCtrl', function($scope, service_product
 			sku: $scope.product.sku,
 			thumb: $scope.product.thumb,
 			flavors: $scope.product.flavors,
-			details_field: $scope.product.details_field
+			details_field: $scope.product.details_field,
+			custom_size: $scope.product.custom_size
 		}, function(data) {
 			console.log('RESP: ', data, $scope.product)
 			$scope.product = {};
@@ -150,7 +151,8 @@ YoAdminApp.controller('yoAdminProductsEditCtrl', function($scope, $routeParams, 
 			sku: $scope.product.sku,
 			thumb: $scope.product.thumb,
 			flavors: $scope.product.flavors,
-			details_field: $scope.product.details_field
+			details_field: $scope.product.details_field,
+			custom_size: $scope.product.custom_size
 		};
 
 		service_products.save({id: $scope.product._id, body: body}, function(data) {

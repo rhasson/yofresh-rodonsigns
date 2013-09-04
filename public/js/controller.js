@@ -6,6 +6,7 @@ var YoApp = angular.module('YoApp',
 	['YoApp.services.Products'
 	 , 'YoApp.services.Orders'
 	 , 'YoApp.services.Session'
+	 , 'YoApp.services.Shipping'
 	 , 'YoApp.services.Basket'
 	 , 'YoApp.services.Accounts'
 	 , 'ngSanitize'
@@ -212,8 +213,16 @@ YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 		x.quantity = parseFloat($scope.new_quantity);
 		x.price = $scope.ssize ? $scope.ssize.price : parseFloat(x.price);
 		x.total = x.quantity * x.price;
-		x.default_width = $scope.ssize ? $scope.ssize.w : 0;
-		x.default_height = $scope.ssize ? $scope.ssize.h : 0;
+		x.default_width = $scope.ssize ? 
+			($scope.ssize.w ? $scope.ssize.w : 0) : 
+				x.custom_size ?
+					(x.custom_w ? x.custom_w : 0) : 0;
+		x.default_height = $scope.ssize ? 
+			($scope.ssize.h ? $scope.ssize.h : 0) :
+				x.custom_size ? 
+					(x.custom_h ? x.custom_h : 0) : 0;
+
+		if (x.custom_size) x.total = x.quantity * (x.price * (x.default_height * x.default_width));
 		service_basket.set(x);
 		$scope.model.basket = service_basket.all();
 	}
@@ -250,22 +259,21 @@ YoApp.controller('yoCheckoutCtrl', function($scope, service_basket) {
 });
 
 /* contoller for handling final checkout */
-YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service_orders) {
+YoApp.controller('yoFinalCheckoutCtrl', function($scope, service_basket, service_shipping, service_orders) {
 	var ps;
 
 	$scope.order = {
 		total: 0
 		, subtotal: 0
 		, tax: 0
-		, shipping: 25
+		, shipping: 0
 	};
 
 	var items = service_basket.all(true);  //true tells function to clean up selected_flavors
 
 	$scope.order.subtotal = service_basket.subtotal();
 
-	if (items.length) service_basket.shipping = $scope.order.shipping;  // really ugly hack
-	else $scope.order.shipping = 0;
+	$scope.order.shipping = service_shipping.get($scope.order.subtotal);
 
 	$scope.order.total = service_basket.total();
 

@@ -96,18 +96,22 @@ angular.module('YoApp.services.Session', [])
 * Returns an API to interface with basket items
 ********************************************************************/
 angular.module('YoApp.services.Basket', [])
-	.factory('service_basket', ['$rootScope', function(root) {
+	.factory('service_basket', ['$rootScope', 'service_shipping', function(root, ss) {
 		function Basket() {
 			this._basket = [];
-			this._tax = 6 / 100;
+			this._tax = 6 / 100;  // 6%
 			this.shipping = 0;
 		}
 
 		Basket.prototype.set = function(item) {
 			var i; 
 			if (i = this._basket[item._id]) {
-				i.quantity += item.quantity;
-				i.total = i.quantity * parseFloat(i.price);
+				if (i.default_width === item.default_width && i.default_height === item.default_height) {
+					i = item;
+				} else {
+					//TODO: support sizes of the same product.  array for id with multiple selections
+					i = item;  //for now just overwrite the previous selection
+				}
 			} else {
 				i = item;
 			}
@@ -139,25 +143,60 @@ angular.module('YoApp.services.Basket', [])
 		}
 
 		Basket.prototype.tax = function() {
-			var t, state;
+			var n;
 			if ('model' in root && 'account' in root.model) {
-				if (root.model.account.address.billing.state === 'PA') return ((this.subtotal() + this.shipping) * this._tax);
+				if (root.model.account.address.billing.state === 'PA') {
+					n = ((this.subtotal() + ss.get(this.subtotal())) * this._tax);
+					console.log('tax: ', n);
+					return floorFigure(n, 2);
+				}
 				else return 0;
 			}
 			else return -1;
 		}
 
 		Basket.prototype.total = function() {
-			return this.subtotal() + this.shipping + this.tax();
+			var n = this.subtotal() + ss.get(this.subtotal()) + this.tax()
+			console.log('total: ', n)
+			return floorFigure(n, 2);
 		}
 
 		Basket.prototype.subtotal = function() {
-			var t = 0, self = this;
+			var n, t = 0, self = this;
 			Object.keys(self._basket).forEach(function(v) {
 				t += self._basket[v].total;
 			});
-			return t;
+			n = parseFloat(t);
+			console.log('subtotal: ', n)
+			return floorFigure(n, 2);
 		}
+
+		function floorFigure(figure, decimals){
+    		var d;
+    		if (!decimals) decimals = 2;
+    		d = Math.pow(10,decimals);
+    		return parseFloat((parseInt(figure*d)/d).toFixed(decimals));
+		};
 
 		return new Basket();
 	}]);
+
+/*******************************************************************
+* Shopping shipping service
+* Returns an API to interface with shipping items
+********************************************************************/
+angular.module('YoApp.services.Shipping', [])
+	.factory('service_shipping', ['$rootScope', function(root) {
+		function Shipping() {}
+
+		Shipping.prototype.get = function(n) {
+			if (n === 0) return 0;
+			else if (n > 0 && n <= 100) return 10;
+			else if (n > 100 && n <= 250) return 20;
+			else if (n > 250 && n <= 500) return 35;
+			else return 50;
+		}
+
+		return new Shipping();
+	}]);
+

@@ -82,15 +82,20 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
       p(ng-show='item.sizes.length > 1')
         select(ng-model='ssize', ng-options="s.w+'x'+s.h for s in item.sizes")
       p(ng-show='item.sizes.length == 1') Size: {{item.sizes[0].w}}" x {{item.sizes[0].h}}"
+      p(ng-show='item.custom_size') Enter size:
+        input.number(type='number', min='1', inputmode='numeric', ng-model='item.custom_w')
+        span in. width
+        input.number(type='number', min='1', inputmode='numeric', ng-model='item.custom_h')
+        span in. height
       p Quantity: 
-        input.quantity(type='number', min='1', inputmode='numeric', value='{{new_quantity}}')
+        input.number.quantity(type='number', min='1', inputmode='numeric', ng-model='new_quantity')
         span(ng-show='item.unit > 1') each is a set of {{item.unit}}
       p(ng-show='item.details_field') {{item.details_field}}:&nbsp;&nbsp;
         input.details(type='text', ng-model='item.details')
       p(ng-show='item.flavors && item.flavors.length > 0', data-yo-product-flavors)
-      p(ng-show='item.sizes.length > 1') Price: ${{ssize.price}}
-      p(ng-show='item.sizes.length == 1') Price: ${{item.sizes[0].price}}
-      p(ng-show='item.sizes.length <= 0') Price: ${{item.price}}
+      p(ng-show='item.sizes.length > 1') Price: {{ssize.price | currency}}
+      p(ng-show='item.sizes.length == 1') Price: {{item.sizes[0].price | currency}}
+      p(ng-show='item.sizes.length <= 0') Price: {{item.price | currency}}
       p 
         a.add-btn.btn.btn-primary(ng-click='add()') Add
         a.remove-btn.btn.hide(ng-click='remove()') Remove
@@ -129,8 +134,8 @@ script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.name}}
   td: span(ng-show='item.default_width > 0') {{item.default_width}}" X {{item.default_height}}"
   td {{item.quantity}}
-  td ${{item.price}}
-  td ${{item.total}}
+  td {{item.price | currency}}
+  td {{item.total | currency}}
   td: a(href ng-click='remove()') Remove
 
 script(type='text/ng-template', id='yo-checkout-final-tpl')
@@ -142,16 +147,16 @@ script(type='text/ng-template', id='yo-checkout-final-tpl')
           table.table
             tr
               td Subtotal
-              td ${{order.subtotal}}
+              td {{order.subtotal | currency}}
             tr
               td Shipping
-              td ${{order.shipping}}
+              td {{order.shipping | currency}}
             tr
               td Tax
-              td ${{getTax()}}
+              td {{getTax() | currency}}
             tr
               td Total
-              td ${{order.total}}
+              td {{order.total | currency}}
           div
             button.btn.btn-primary(data-yo-stripe-form) Buy
 
@@ -171,7 +176,7 @@ script(type='text/ng-template', id='yo-orders-summary-items-tpl')
   td
     a(ng-click='orderDetail()') {{order.confirmation_number}}
   td {{formatDate(order.created_at)}}
-  td ${{order.total}}
+  td {{order.total | currency}}
   td {{order.status_message}}
 
 script(type='text/ng-template', id='yo-accounts-tpl')

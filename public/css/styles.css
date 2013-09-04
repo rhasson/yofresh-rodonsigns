@@ -57,7 +57,7 @@
 }
 
 .message { text-align: center; }
-.quantity {
+.number {
   width: 30px;
   margin: 0 5px 0 10px;
 }

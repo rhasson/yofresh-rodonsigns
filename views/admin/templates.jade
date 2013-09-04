@@ -48,6 +48,10 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
               a(href ng-click='sizes.splice($index, 1)') [X]
             li: a(href ng-click='sizes.push({})') [Add]
       div.control-group
+        label.control-label(for='product_custom_size') Allow customer to set size:
+        div.controls
+          input(type='checkbox', id='product_custom_size', ng-model='product.custom_size')
+      div.control-group
         label.control-label(for='product_flavors') Flavors (optional, comma separated list):
         div.controls
           input(type='text', id='product_flavors', ng-model='product.flavors')
@@ -67,7 +71,7 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
         label.control-label(for='product_price') Price:
         div.controls
           input(type='text', id='product_price', ng-model='product.price')
-          h6 This field is only used if the product is not a sign and doesn't have dimensions
+          h6 This field is only used to set price per sq/ft or for a non-sign product
       div.control-group
         label.control-label(for='product_sku') SKU:
         div.controls
