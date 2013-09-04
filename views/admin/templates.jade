@@ -19,8 +19,8 @@ script(type='text/ng-template', id='yo-admin-products-tpl')
 script(type='text/ng-template', id='yo-admin-products-items-tpl')
   td {{item.name}}
   td: span(ng-show='item.sizes.length >= 1'){{item.sizes[0].w}}" x {{item.sizes[0].h}}"
-  td(ng-show='item.sizes.length >= 1') ${{item.sizes[0].price}}
-  td(ng-show='item.sizes.length == 0 && item.price') ${{item.price}}
+  td(ng-show='item.sizes.length >= 1') {{item.sizes[0].price | currency}}
+  td(ng-show='item.sizes.length == 0 && item.price') {{item.price | currency}}
   td: a(href='#/products/edit/{{item._id}}') Edit
   td: a(href ng-click='remove()') Remove
 
@@ -100,7 +100,7 @@ script(type='text/ng-template', id='yo-admin-orders-summary-items-tpl')
     p Items purchased:
     div.items
       dl.dl-horizontal(ng-repeat='item in order.items', data-yo-admin-order-desc)
-    p Total: ${{order.total}}
+    p Total: {{order.total | currency}}
     p Credit card: {{order.stripe_token.card.type}} ending with {{order.stripe_token.card.last4}}
     a.btn.btn-primary(href, ng-hide='order.payment.paid', ng-click='captureCharge(order._id)') Charge
 
@@ -110,4 +110,4 @@ script(type='text/ng-template', id='yo-admin-order-desc-tpl')
   dt Quantity
   dd {{item.quantity}}
   dt Total
-  dd {{item.total}}
+  dd {{item.total | currency}}
