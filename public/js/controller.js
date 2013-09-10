@@ -222,7 +222,8 @@ YoApp.controller('yoProductDetailCtrl', function($scope, service_basket) {
 				x.custom_size ? 
 					(x.custom_h ? x.custom_h : 0) : 0;
 
-		if (x.custom_size) x.total = x.quantity * (x.price * (x.default_height * x.default_width));
+		if (x.selected_flavors.length > 0) x.total = (x.price * x.selected_flavors.length) * x.quantity;
+		else if (x.custom_size) x.total = x.quantity * (x.price * (x.default_height * x.default_width));
 		service_basket.set(x);
 		$scope.model.basket = service_basket.all();
 	}
