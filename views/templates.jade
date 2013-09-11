@@ -132,6 +132,7 @@ script(type='text/ng-template', id='yo-checkout-tpl')
 
 script(type='text/ng-template', id='yo-checkout-items-table-tpl')
   td {{item.name}}
+    span(ng-show='item.selected_flavors') &nbsp;({{item.selected_flavors.length}} Flavors)
   td: span(ng-show='item.default_width > 0') {{item.default_width}}" X {{item.default_height}}"
   td {{item.quantity}}
   td {{item.price | currency}}
