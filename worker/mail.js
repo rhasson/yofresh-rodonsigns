@@ -28,7 +28,7 @@ function Mail() {
             inline_css: true,
             url_strip_qs: false,
             preserve_recipients: false,
-            bcc_address: "",
+            bcc_address: process.env.NODE_ENV === 'production' ? "sales@rodonsigns.com" : "",
             tracking_domain: "yofresh.rodonsigns.com",
             signing_domain: null,
             tags: [],
