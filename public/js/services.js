@@ -147,7 +147,7 @@ angular.module('YoApp.services.Basket', [])
 			if ('model' in root && 'account' in root.model) {
 				if (root.model.account.address.billing.state === 'PA') {
 					n = ((this.subtotal() + ss.get(this.subtotal())) * this._tax);
-					console.log('tax: ', n);
+					if ((''+n).match(/(\.[0-9]{2,})$/ig)) return n;
 					return floorFigure(n, 2);
 				}
 				else return 0;
@@ -157,7 +157,6 @@ angular.module('YoApp.services.Basket', [])
 
 		Basket.prototype.total = function() {
 			var n = this.subtotal() + ss.get(this.subtotal()) + this.tax()
-			console.log('total: ', n)
 			return floorFigure(n, 2);
 		}
 
@@ -167,7 +166,6 @@ angular.module('YoApp.services.Basket', [])
 				t += self._basket[v].total;
 			});
 			n = parseFloat(t);
-			console.log('subtotal: ', n)
 			return floorFigure(n, 2);
 		}
 
