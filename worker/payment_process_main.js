@@ -2,8 +2,8 @@
 * Payment processing worker
 * v.0.0.1
 ********************************************************************/
-
-var stripe = require('stripe')(require('../config').config.stripe.test_secret)
+var config = require('../config').config;
+var stripe = require('stripe')(process.env.NODE_ENV === 'production' ? config.stripe.live_secret : config.stripe.test_secret);
     , Q = require('q')
   	, kue = require('kue')
   	, jobs = kue.createQueue()
