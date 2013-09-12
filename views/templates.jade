@@ -79,7 +79,7 @@ script(type='text/ng-template', id='yo-product-detail-short-tpl')
     div.media-body
       h4.media-heading {{item.name}}
       p {{item.desc}}
-      p(ng-show='item.sizes.length > 1') Select Size:
+      p(ng-show='item.sizes.length > 1') Select Size:&nbsp;&nbsp;
         select(ng-model='ssize', ng-options="s.w+'x'+s.h for s in item.sizes")
       p(ng-show='item.sizes.length == 1') Size: {{item.sizes[0].w}}" x {{item.sizes[0].h}}"
       p(ng-show='item.custom_size') Enter size:
