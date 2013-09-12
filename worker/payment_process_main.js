@@ -7,7 +7,8 @@ var stripe = require('stripe')(require('../config').config.stripe.test_secret)
     , Q = require('q')
   	, kue = require('kue')
   	, jobs = kue.createQueue()
-    , db = require('../lib/db');
+    , db = require('../lib/db')
+    , u = require('util');
 
 jobs.process('create stripe customer', 10, function(job, done) {
   console.log('job:' ,job.data)

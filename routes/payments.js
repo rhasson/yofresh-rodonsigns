@@ -22,7 +22,7 @@ module.exports = exports = {
 						
 						p.on('failed', function(e) {
 							console.log('capture payment job failed: ', e);
-							resp.json({error: {code: 0, message: 'failed to process payment: ' + e}});
+							resp.status(402).json({error: {code: 0, message: 'failed to process payment: ' + e}});
 						});
 						p.on('complete', function() {
 							console.log('DONE: ', doc)
