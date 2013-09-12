@@ -450,7 +450,21 @@ YoApp.directive('yoCheckoutItems', function() {
 /* list a summary of all orders */
 YoApp.directive('yoOrdersSummary', function() {
 	var linkFn = function(scope, el, attr) {
-		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
+		if ('payment' in scope.order) {
+			if (scope.order.payment.paid) {
+				if (!el.hasClass('success')) el.addClass('success');
+				el.removeClass('warning error');
+				scope.order.status_message = 'Paid';
+			} else if (scope.order.payment.failure_code) {
+				if (!el.hasClass('error')) el.addClass('error');
+				el.removeClass('warning success');
+				scope.order.status_message = scope.order.payment.failure_message;
+			} else {
+				if (!el.hasClass('warning')) el.addClass('warning');
+				el.removeClass('success error');
+			}
+		}
+/*		if (scope.order.status_code >= 0 && scope.order.status_code < 3) {
 			el.removeAttr('class');
 			el.addClass('ng-scope warning');
 		}
@@ -462,6 +476,7 @@ YoApp.directive('yoOrdersSummary', function() {
 			el.removeAttr('class');
 			el.addClass('ng-scope error');
 		}
+*/
 	};
 
 	return {

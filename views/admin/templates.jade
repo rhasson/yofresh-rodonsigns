@@ -14,7 +14,7 @@ script(type='text/ng-template', id='yo-admin-products-tpl')
               th Size
               th $/unit
           tbody
-            tr(ng-repeat='item in model.products', data-yo-admin-product-list)
+            tr(ng-repeat="item in model.products | orderBy:'name'", data-yo-admin-product-list)
 
 script(type='text/ng-template', id='yo-admin-products-items-tpl')
   td {{item.name}}
@@ -87,7 +87,7 @@ script(type='text/ng-template', id='yo-admin-products-new-tpl')
 
 script(type='text/ng-template', id='yo-admin-orders-tpl')
   div.span8
-    div.well(ng-repeat='order in model.orders', data-yo-admin-orders-summary)
+    div.well(ng-repeat="order in model.orders | orderBy:'created_at':true", data-yo-admin-orders-summary)
 
 script(type='text/ng-template', id='yo-admin-orders-summary-items-tpl')
   span.pull-right.label

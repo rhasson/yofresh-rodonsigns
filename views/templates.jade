@@ -122,7 +122,7 @@ script(type='text/ng-template', id='yo-checkout-tpl')
             th $/unit
             th Total
         tbody
-          tr(ng-repeat='item in model.basket', data-yo-checkout-items)
+          tr(ng-repeat="item in model.basket | orderBy:'name'", data-yo-checkout-items)
     div.row
       div.span6
         p
@@ -171,7 +171,7 @@ script(type='text/ng-template', id='yo-orders-tpl')
           th Payment taken
           th Order Status
       tbody
-        tr(ng-repeat='order in model.orders', data-yo-orders-summary)
+        tr(ng-repeat="order in model.orders | orderBy:'created_at':true", data-yo-orders-summary)
 
 script(type='text/ng-template', id='yo-orders-summary-items-tpl')
   td
