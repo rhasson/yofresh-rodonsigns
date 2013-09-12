@@ -115,13 +115,21 @@ module.exports = exports = {
 			p.on('complete', function() {
 				db.save('orders', req.session.user_id, order)
 				.then(function(doc) {
-					var j;
+					var j, t;
 					delete temp.stripe_token;
 					temp.order_id = doc._id;
+					
+					t = jobs.create('internal order confirmation', temp);
+					t.on('failed', function(e) {
+						console.log('internal order job failed: ', temp, e);
+					});
+
 					j = jobs.create('order confirmation', temp);
 					j.on('failed', function(e) {
 						console.log('order confirmation job failed: ', temp, e);
 					});
+
+					t.save();
 					j.save();
 					resp.json(doc);
 				})

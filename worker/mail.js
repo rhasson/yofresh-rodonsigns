@@ -177,6 +177,70 @@ Mail.prototype.create_new_order = function(fields) {
     return def.promise;
 }
 
+Mail.prototype.create_new_internal_order = function(fields) {
+    var def = Q.defer()
+        , self = this
+        , path = process.cwd() + '/tpls/new-internal-order.jade'
+        , tpl = ''
+        , body;
+
+    if (typeof self._templates['new_internal_order'] !== 'function') {
+        fs.readFile(path, {encoding: 'utf8'}, function(e, t) {
+            console.log(e)
+            if (!e) {
+                self._templates['new_internal_order'] = jade.compile(t);
+                body = render(self._templates['new_internal_order'], self._body, fields);
+                def.resolve(body);
+            } else {
+                body = render(null, self._body, fields);
+                def.resolve(body);
+            }
+        });
+    } else {
+        body = render(self._templates['new_internal_order'], self._body, fields);
+        def.resolve(body);
+    }
+
+    function render(fn, body, fields) {
+        var tpl = '';
+        var b = {};
+
+        util._extend(b, body);
+
+        if (fn && typeof fn === 'function') tpl = fn(fields);
+        else {
+            tpl = 
+                'New Order\r\n\r\n' +
+                fields.user.first + ' ' + fields.user.last + ' (' + fields.user.email + ')\n' +
+                'Order confirmation number is: ' + fields.confirmation_number + ' \r\n\r\n' +
+                'Order Detail:\n';
+            fields.items.forEach(function(v) {
+                tpl += v.name + ' (SKU: ' + v.sku.toUpperCase() + ')\n';
+                tpl += 'Size - ';
+                if (('custom_size' in v) && v.custom_size) tpl += 'Width: ' + v.custom_w + '/ Height: ' + v.custom_h + '\n';
+                else tpl += 'Width: ' + v.default_width + '/ Height: ' + v.default_height + '\n';
+                if (('selected_flavors' in v) && v.selected_flavors.length > 0) tpl += 'Flavors: ' + v.selected_flavors.toString() + '\n';
+                if ('details_field' in v) tpl += v.details_field + ': ' + v.details + '\n';
+                tpl += 'Quantity: ' + v.quantity + '\n';
+
+            });
+
+            tpl += '\r\n';
+        }
+
+        (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;
+        b.message.subject = 'YoFresh@RodonSigns Order Detail';
+        b.message.to[0].email = 'sales@rodonsigns.com';
+        b.message.to[0].name = 'Internal';
+        b.message.bcc_address = '';
+        b.message.tags = ["order", "detail", "internal"];
+
+        return (b);
+    }
+
+    return def.promise;
+}
+
 Mail.prototype.create_payment_conf = function(fields) {
     var def = Q.defer()
         , self = this

@@ -60,6 +60,36 @@ jobs.process('order confirmation', 10, function(job, done) {
   })
 });
 
+jobs.process('internal order confirmation', 10, function(job, done) {
+  db.get('orders', job.data.order_id)
+  .then(function(doc) {
+    doc.user = {
+      name: job.data.name,
+      email: job.data.email
+    };
+    mail.create_new_internal_order(doc)
+    .then(function(data) {
+      Q.ninvoke(api, 'messages_send', data)
+      .then(function(resp) {
+        console.log('completed sending internal mail: ', resp);
+        done();
+      })
+      .fail(function(err) {
+        console.log('new internal order worker: failed to send mail ', err);
+        done(err);
+      });
+    })
+    .fail(function(err) {
+      console.log('new internal order worker: failed to create mail template');
+      done(err);
+    });
+  })
+  .fail(function(err) {
+    console.log('new internal order worker: failed to get order detail from db ', err);
+    done(err);
+  })
+});
+
 jobs.process('payment confirmation', 10, function(job, done) {
   var order_id = job.data;
 

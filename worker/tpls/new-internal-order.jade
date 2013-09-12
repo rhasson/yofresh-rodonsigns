@@ -1,0 +1,25 @@
+div
+  h2 New Order
+  p #{user.first} #{user.last} 
+    a(mailto=user.email) (#{user.email})
+  p Order confirmation number is: #{confirmation_number}
+
+  hr
+
+  h3 Order Detail:
+  ul
+    each item in items
+      li
+        div
+          p #{item.name} (SKU: #{item.sku.toUpperCase()})
+          p
+            | Size - 
+            - if ('custom_size' in item && item.custom_size)
+              | Width: #{item.custom_w} / Height: #{item.custom_h}
+            - else
+              | Width: #{item.default_width} / Height: #{item.default_height}
+          if ('selected_flavors' in item && item.selected_flavors.length > 0)
+            p Flavors: #{item.selected_flavors.toString()}
+          if ('details_field' in item)
+            p #{item.details_field}: item.details
+          p Quantity: #{item.quantity}
