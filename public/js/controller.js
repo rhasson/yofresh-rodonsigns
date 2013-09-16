@@ -516,7 +516,7 @@ YoApp.directive('yoStripeForm', function() {
 			}
 
 			StripeCheckout.open({
-			    key: 'pk_mt4iXpNq5hh7g51R2nnDBVqnT5CSY'  //'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
+			    key: 'pk_mt4iXpNq5hh7g51R2nnDBVqnT5CSY' //'pk_m4C7oD4vQQiBq6PO0ipmdNSUYVU1x'
 			  , amount: parseFloat(scope.order.total) * 100
 			  , name: 'YoFresh@RodonSigns'
 			  , description: ''

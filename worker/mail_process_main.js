@@ -33,10 +33,11 @@ jobs.process('registration confirmation', 10, function(job, done) {
 jobs.process('order confirmation', 10, function(job, done) {
   db.get('orders', job.data.order_id)
   .then(function(doc) {
-    doc.user = {
+  /*  doc.user = {
       name: job.data.name,
       email: job.data.email
     };
+  */
     mail.create_new_order(doc)
     .then(function(data) {
       Q.ninvoke(api, 'messages_send', data)
@@ -63,10 +64,11 @@ jobs.process('order confirmation', 10, function(job, done) {
 jobs.process('internal order confirmation', 10, function(job, done) {
   db.get('orders', job.data.order_id)
   .then(function(doc) {
-    doc.user = {
+/*    doc.user = {
       name: job.data.name,
       email: job.data.email
     };
+*/
     mail.create_new_internal_order(doc)
     .then(function(data) {
       Q.ninvoke(api, 'messages_send', data)

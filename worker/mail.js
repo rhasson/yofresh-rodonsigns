@@ -144,7 +144,7 @@ Mail.prototype.create_new_order = function(fields) {
         else {
             tpl = 
                 'New Order Confirmation\r\n\r\n' +
-                fields.user.name + ' thank you for placing an order with YoFresh@RodonSigns.\n' +
+                fields.user.first + ' thank you for placing an order with YoFresh@RodonSigns.\n' +
                 'Your order confirmation number is: ' + fields.confirmation_number + ' \r\n\r\n' +
                 'Order Summary:\n';
             fields.items.forEach(function(v) {
@@ -166,7 +166,7 @@ Mail.prototype.create_new_order = function(fields) {
         (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;
         b.message.subject = 'YoFresh@RodonSigns Order Confirmation';
         b.message.to[0].email = fields.user.email;
-        b.message.to[0].name = fields.user.name;
+        b.message.to[0].name = fields.user.first;
         b.message.recipient_metadata[0].rcpt = fields.user.email;
         b.message.recipient_metadata[0].values.user_id = fields.user_id;
         b.message.tags = ["order", "confirmation"];
@@ -229,7 +229,7 @@ Mail.prototype.create_new_internal_order = function(fields) {
         }
 
         (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;
-        b.message.subject = 'YoFresh@RodonSigns Order Detail';
+        b.message.subject = 'YoFresh@RodonSigns New Order Detail';
         b.message.to[0].email = 'sales@rodonsigns.com';
         b.message.to[0].name = 'Internal';
         b.message.bcc_address = '';
