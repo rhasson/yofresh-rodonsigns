@@ -31,7 +31,6 @@ module.exports = exports = {
 		},
 		register: function(req, resp, next) {
 			if (req.session) {
-				console.log('BODY: ', req.body);
 				var b = {
 					firstname: Capitalize(req.body.firstname),
 					lastname: Capitalize(req.body.lastname),
@@ -89,7 +88,6 @@ module.exports = exports = {
 			}
 		},
 		admin: function(req, resp, next) {
-			console.log(req.session)
 			if (req.session) {
 				if (req.session.group === 'admin') resp.render('admin');
 				else resp.render('home');

@@ -12,7 +12,6 @@ var Express = require('express')
 
 var SECRET = 'yofresh commerce site';
 
-console.log(process.env);
 /* Server Configuration */
 server.configure(function(){
   server.use(Express.logger());

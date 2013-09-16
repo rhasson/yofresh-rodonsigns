@@ -25,7 +25,6 @@ module.exports = exports = {
 							resp.status(402).json({error: {code: 0, message: 'failed to process payment: ' + e}});
 						});
 						p.on('complete', function() {
-							console.log('DONE: ', doc)
 							resp.json({id: doc._id});
 							j = jobs.create('payment confirmation', doc._id);
 							j.on('failed', function(e) {
