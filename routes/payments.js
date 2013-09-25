@@ -13,7 +13,7 @@ module.exports = exports = {
 				db.get('orders', req.params.id)
 				.then(function(doc) {
 					var p;
-					if (doc.user_id === req.session.user_id) {
+					if (req.session.group === 'admin') {
 						p = jobs.create('capture charges', {
 							id: req.params.id
 						  , user_id: req.session.user_id
@@ -34,11 +34,11 @@ module.exports = exports = {
 						});
 						p.priority('high').attempts(3).save();
 					} else {
-						resp.json({error: {code: 0, message: 'not authorized to access this record'}});
+						resp.status(402).json({error: {code: 0, message: 'not authorized to access this record'}});
 					}
 				})
 				.fail(function(err) {
-					resp.json({error: {code: 0, message: 'failed to retreive record: ' + err}});
+					resp.status(402).json({error: {code: 0, message: 'failed to retreive record: ' + err}});
 				});
 			}
 		}
