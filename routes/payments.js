@@ -16,7 +16,7 @@ module.exports = exports = {
 					if (req.session.group === 'admin') {
 						p = jobs.create('capture charges', {
 							id: req.params.id
-						  , user_id: req.session.user_id
+						  , user_id: doc.user_id
 						  , order: doc
 						});
 						
