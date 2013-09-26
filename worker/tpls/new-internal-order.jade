@@ -1,6 +1,6 @@
 div
   h2 New Order
-  p #{user.first} #{user.last} 
+  p #{user.firstname} #{user.lastname} 
     a(mailto=user.email) (#{user.email})
   p Order confirmation number is: #{confirmation_number}
 
@@ -23,3 +23,9 @@ div
           if ('details_field' in item)
             p #{item.details_field}: item.details
           p Quantity: #{item.quantity}
+  h3 Billing Address:
+  p #{user.address.billing.street}
+  p #{user.address.billing.city}, #{user.address.billing.state} #{user.address.billing.zip}
+  h3 Shipping Address:
+  p #{user.address.shipping.street}
+  p #{user.address.shipping.city}, #{user.address.shipping.state} #{user.address.shipping.zip}

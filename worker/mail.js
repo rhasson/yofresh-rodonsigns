@@ -211,7 +211,7 @@ Mail.prototype.create_new_internal_order = function(fields) {
         else {
             tpl = 
                 'New Order\r\n\r\n' +
-                fields.user.first + ' ' + fields.user.last + ' (' + fields.user.email + ')\n' +
+                fields.user.firstname + ' ' + fields.user.lastname + ' (' + fields.user.email + ')\n' +
                 'Order confirmation number is: ' + fields.confirmation_number + ' \r\n\r\n' +
                 'Order Detail:\n';
             fields.items.forEach(function(v) {
@@ -222,10 +222,19 @@ Mail.prototype.create_new_internal_order = function(fields) {
                 if (('selected_flavors' in v) && v.selected_flavors.length > 0) tpl += 'Flavors: ' + v.selected_flavors.toString() + '\n';
                 if ('details_field' in v) tpl += v.details_field + ': ' + v.details + '\n';
                 tpl += 'Quantity: ' + v.quantity + '\n';
-
             });
 
-            tpl += '\r\n';
+            tpl += '\r\n\r\n';
+            tpl += 'Billing Address:\r\n' +
+                   fields.user.address.billing.street + '\n' +
+                   fields.user.address.billing.city + ' ' +
+                   fields.user.address.billing.state + ', ' +
+                   fields.user.address.billing.zip + '\r\n';
+            tpl += 'Shipping Address:\r\n' +
+                   fields.user.address.shipping.street + '\n' +
+                   fields.user.address.shipping.city + ' ' +
+                   fields.user.address.shipping.state + ', ' +
+                   fields.user.address.shipping.zip + '\r\n';
         }
 
         (typeof fn === 'function') ? b.message.html = tpl : b.message.text = tpl;

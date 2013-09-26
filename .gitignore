@@ -5,3 +5,4 @@ rem_db.js
 .DS_Store
 dump.rdb
 worker/test.js
+worker/test.html
