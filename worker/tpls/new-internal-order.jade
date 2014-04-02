@@ -21,7 +21,7 @@ div
           if ('selected_flavors' in item && item.selected_flavors.length > 0)
             p Flavors: #{item.selected_flavors.toString()}
           if ('details_field' in item)
-            p #{item.details_field}: item.details
+            p #{item.details_field}: #{item.details}
           p Quantity: #{item.quantity}
   h3 Billing Address:
   p #{user.address.billing.street}
